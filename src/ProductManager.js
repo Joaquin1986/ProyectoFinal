@@ -1,11 +1,10 @@
-// Se definen los módulos a importar
+// Se realizan los imports mediante 'require', de acuerdo a lo visto en clase
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 
-
 // Clase Product, con su correspondiente contructor las props definidas en la consigna
 class Product {
-    constructor(title, description, price, code, stock) {
+    constructor(title, description, price, code, stock, category) {
         this.id = uuidv4();
         this.title = title;
         this.description = description;
@@ -14,27 +13,27 @@ class Product {
         this.code = code;
         this.status = true;
         this.stock = stock;
+        this.category = category;
     }
 }
 
+const path = "./src/products.json";
+let products = [];
+
 // Clase ProductManager con su constructor tal como se solicitó, con un array 'products' vacío
 class ProductManager {
-    constructor(path) {
-        this.path = path;
-        fs.existsSync(this.path) ? this.products = this.getProducts() : this.products = [];
-    }
 
     // Agrega un producto al array 'products'
-    async addProduct(product) {
+    static async addProduct(product) {
         let worked = true;
-        if (fs.existsSync(this.path)) {
+        if (fs.existsSync(path)) {
             try {
-                this.products = JSON.parse(await fs.promises.readFile(this.path, "utf-8"));
-                let productAlreadyExist = this.products.find((item) => item.code === product.code);
+                products = JSON.parse(await fs.promises.readFile(path, "utf-8"));
+                let productAlreadyExist = products.find((item) => item.code === product.code);
                 if (!productAlreadyExist) {
                     try {
-                        this.products.push(product);
-                        await fs.promises.writeFile(this.path, JSON.stringify(this.products, null, "\t"), "utf-8");
+                        products.push(product);
+                        await fs.promises.writeFile(path, JSON.stringify(products, null, "\t"), "utf-8");
                         console.log(`✅ Producto '${product.title}' agregado exitosamente`);
                     } catch (error) {
                         throw new Error(`⛔ Error: ${error.message}`);
@@ -50,8 +49,8 @@ class ProductManager {
             }
         } else {
             try {
-                this.products.push(product);
-                await fs.promises.writeFile(this.path, JSON.stringify(this.products, null, "\t"), "utf-8");
+                products.push(product);
+                await fs.promises.writeFile(path, JSON.stringify(products, null, "\t"), "utf-8");
                 console.log(`✅ Producto '${product.title}' agregado exitosamente`);
                 return worked;
             } catch (error) {
@@ -62,29 +61,29 @@ class ProductManager {
     }
 
     // Devuelve el array con todos los productos creados hasta el momento
-    async getProducts() {
-        if (fs.existsSync(this.path)) {
+    static async getProducts() {
+        if (fs.existsSync(path)) {
             try {
-                this.products = JSON.parse(await fs.promises.readFile(this.path, "utf-8"));
-                return this.products;
+                products = JSON.parse(await fs.promises.readFile(path, "utf-8"));
+                return products;
             } catch (error) {
                 throw new Error(`⛔ Error: No se pudo leer el archivo de Productos.
    Descripción del error: ${error.message}`);
             }
         } else {
-            console.error("⛔ Error: El archivo de Productos no existe.");
-            return undefined;
+            await fs.promises.writeFile(path, JSON.stringify(products, null, "\t"), "utf-8");
+            return products;
         }
     }
 
     // En caso de encontrarlo, devuelve un objeto 'Producto' de acuerdo a id proporcionado por argumento.
     // En caso de no encontrarlo, imprime error en la consola.
-    async getProductById(id) {
+    static async getProductById(id) {
         let productFound = undefined;
         try {
-            this.products = await this.getProducts();
-            this.products.forEach(product => {
-                product.id === id ? productFound = product : null;
+            products = await this.getProducts();
+            products.forEach(product => {
+                if (product.id === id) productFound = product;
             })
             if (productFound === undefined) {
                 console.error(`⛔ Error: Producto id #${id} no encontrado`);
@@ -97,11 +96,11 @@ class ProductManager {
 
     // En caso de encontrarlo, devuelve un objeto 'Producto' de acuerdo al codigo proporcionado por argumento.
     // En caso de no encontrarlo, imprime error en la consola.
-    async getProductByCode(code) {
+    static async getProductByCode(code) {
         let productFound = undefined;
         try {
-            this.products = await this.getProducts();
-            this.products.forEach(product => {
+            products = await this.getProducts();
+            products.forEach(product => {
                 product.code === code ? productFound = product : null;
             })
             if (productFound === undefined) {
@@ -114,13 +113,13 @@ class ProductManager {
     }
 
     // Actualiza un producto que es pasado por parámetro en el archivo 'data.json'
-    async updateProduct(product) {
+    static async updateProduct(product) {
         let result = false;
         try {
-            this.products = await this.getProducts();
-            const index = this.products.findIndex(p => p.id === product.id);
-            this.products[index] = product;
-            await fs.promises.writeFile(this.path, JSON.stringify(this.products, null, "\t"), "utf-8");
+            products = await this.getProducts();
+            const index = products.findIndex(p => p.id === product.id);
+            products[index] = product;
+            await fs.promises.writeFile(path, JSON.stringify(products, null, "\t"), "utf-8");
             console.log(`✅ Producto '${product.id}' actualizado exitosamente`);
             result = true;
             return result;
@@ -129,7 +128,7 @@ class ProductManager {
         }
     }
 
-    async deleteProduct(id) {
+    static async deleteProduct(id) {
         let result = false;
         try {
             const productGotten = await this.getProductById(id);
@@ -137,9 +136,9 @@ class ProductManager {
                 console.error(`⛔ Error: No se pudo borrar el producto`);
                 return result;
             } else {
-                const index = this.products.findIndex(product => product.id === id);
-                this.products.splice(index, 1);
-                await fs.promises.writeFile(this.path, JSON.stringify(this.products, null, "\t"), "utf-8")
+                const index = products.findIndex(product => product.id === id);
+                products.splice(index, 1);
+                await fs.promises.writeFile(path, JSON.stringify(products, null, "\t"), "utf-8");
                 console.log(`✅ Producto #${id} eliminado exitosamente`);
                 result = true;
                 return result;
@@ -149,11 +148,11 @@ class ProductManager {
         }
     }
 
-    async productCodeExists(productCode) {
+    static async productCodeExists(productCode) {
         try {
-            this.products = await this.getProducts();
+            products = await this.getProducts();
             let productCodeFound = false;
-            this.products.forEach(product => {
+            products.forEach(product => {
                 if (product.code === productCode) productCodeFound = true;
             });
             return productCodeFound;
@@ -162,11 +161,11 @@ class ProductManager {
         }
     }
 
-    async productIdExists(productId) {
+    static async productIdExists(productId) {
         try {
-            this.products = await this.getProducts();
+            products = await this.getProducts();
             let productIdFound = false;
-            this.products.forEach(product => {
+            products.forEach(product => {
                 if (product.id === productId) productIdFound = true;
             });
             return productIdFound;
@@ -185,7 +184,7 @@ class ProductManager {
         }
     }
 
-    async deleteThumbnail(path) {
+    static async deleteThumbnail(path) {
         try {
             if (this.existsThumbnail(path)) {
                 await fs.promises.unlink(path);
@@ -193,6 +192,21 @@ class ProductManager {
         } catch (error) {
             throw new Error(`⛔ Error: no se pudo borrar la thumbnail ${path} => ${error.message}`);
         }
+    }
+
+    static async removeThumbnailFromProduct(path, product) {
+        const pathParsed = String(path).toLowerCase();
+        let index = 0;
+        let found = false;
+        while (index < product.thumbnails.length && !found) {
+            const thumbnailParsed = String(product.thumbnails[index]).toLowerCase();
+            if (thumbnailParsed === pathParsed) {
+                found = true;
+                product.thumbnails.splice(index, 1);
+            }
+            index++;
+        }
+        return product;
     }
 }
 

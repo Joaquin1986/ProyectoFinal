@@ -1,32 +1,33 @@
+// Se realizan los imports mediante 'require', de acuerdo a lo visto en clase
 const { Router } = require('express');
-const multer = require('multer')
+const multer = require('multer');
 const path = require('path');
+const { Product, ProductManager } = require('../ProductManager.js');
+
+/* Se configura Multer para que los guarde en el directorio 'public/thumbnails' y que mantenga el
+nombre de los archivos, agregando un sufijo para asegurar que sea únicos */
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, path.join(__dirname, '../../public/thumbnails'))
+        cb(null, path.join(__dirname, '../../public/thumbnails'));
     },
     filename: function (req, file, cb) {
-        const uniquePreffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
-        cb(null, uniquePreffix + '-' + file.originalname)
+        const uniquePreffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniquePreffix + '-' + file.originalname);
     }
 })
 const uploadMulter = multer({ storage: storage })
 
-const { Product, ProductManager } = require('../ProductManager.js');
-const { type } = require('os');
-const { stat } = require('fs');
-const { Console } = require('console');
 const productsRouter = Router();
-const pm1 = new ProductManager("./src/products.json");
 
 productsRouter.get("/products", async (req, res) => {
     const { limit } = req.query;
     if (!limit || limit < 1) {
-        const products = await pm1.getProducts();
-        return res.status(200).json(products);
+        const products = await ProductManager.getProducts();
+        if (products.length === 0) return res.status(200).json({ "Productos": "Sin productos creados" });
+        return res.status(200).json({ "Productos": products });
     }
     if (!parseInt(limit)) return res.status(400).json({ "⛔Error": "Límite establecido no válido" })
-    const result = await pm1.getProducts();
+    const result = await ProductManager.getProducts();
     const products = result;
     const filteredProducts = products.slice(0, limit);
     return res.status(200).json(filteredProducts);
@@ -34,12 +35,13 @@ productsRouter.get("/products", async (req, res) => {
 
 productsRouter.get("/products/:pid", async (req, res) => {
     const { pid } = req.params;
-    const product = await pm1.getProductById(pid)
+    const product = await ProductManager.getProductById(pid)
     if (product) return res.status(200).json(product);
     return res.status(404).json({ "⛔Error": `Producto id #${pid} no encontrado` });
 });
 
-productsRouter.post("/products", async (req, res) => {
+// Al siguiente endpoint (POST) se le puede pasar un array llamado 'thumbnails" por Multer
+productsRouter.post("/products", uploadMulter.array('thumbnails'), async (req, res) => {
     const { body } = req;
     const { title, description, price, code, stock, category } = body;
     if (!title || !description || !price || !code || !stock || !category) {
@@ -49,8 +51,14 @@ productsRouter.post("/products", async (req, res) => {
         });
     } else {
         try {
-            const prod1 = new Product(title, description, price, code, stock, category);
-            const result = await pm1.addProduct(prod1);
+            const prod1 = new Product(title, description, parseInt(price), code, parseInt(stock), category);
+            // Si hay thumbnails subidas por Multer, se agregan al producto
+            if (req.files.length > 0) {
+                req.files.forEach((file) => {
+                    prod1.thumbnails.push(file.path);
+                });
+            }
+            const result = await ProductManager.addProduct(prod1);
             if (result) return res.status(201).json({ "✅Producto Creado: ": prod1.id });
             return res.status(400).json({
                 "⛔Error:":
@@ -62,47 +70,55 @@ productsRouter.post("/products", async (req, res) => {
     }
 });
 
-productsRouter.put("/products/:pid", uploadMulter.single('thumbnail'), async (req, res) => {
-    /*Este Router admite como opcional que se envíe el valor 'deleteThumbIndex" en el body,
-    el cual corresponde a la posición (a partir del 1) de cierta thumbnail que se desee borrar.
-    Unicos status permitidos: true o false. Valor por defecto siempre es true, a menos que se elija false
-    */
+/* El siguiente endpoint (put) admite de forma opcional que se envíe el valor 'deleteThumbIndex" en el body,
+   el cual corresponde a la posición (a partir del 1) de cierta thumbnail que se desee borrar.
+   Unicos status permitidos: true o false. Valor por defecto siempre es true, a menos que se elija false.*/
+
+productsRouter.put("/products/:pid", uploadMulter.array('thumbnails'), async (req, res) => {
     const changesDone = [];
     const { pid } = req.params
     const { body } = req;
-    const { title, description, price, code, status, stock, deleteThumbIndex } = body;
-    const deleteThumbIndexParsed = parseInt(deleteThumbIndex);
+    const { title, description, price, code, status, stock, deleteThumbIndex, category } = body;
+    const deleteThumbIndexParsed = [];
+    if (deleteThumbIndex) {
+        Object.values(deleteThumbIndex).forEach((value) => {
+            deleteThumbIndexParsed.push(parseInt(value));
+        });
+    }
     if (pid) {
         try {
             let statusNew = true;
             if (status && status.toLowerCase() === "false") statusNew = false;
             if (status && status.toLowerCase() === "true") statusNew = true;
-            existsId = await pm1.productIdExists(pid);
+            existsId = await ProductManager.productIdExists(pid);
             if (existsId) {
-                const prodFound = await pm1.getProductById(pid);
+                const prodFound = await ProductManager.getProductById(pid);
                 if (prodFound.code !== code) return res.status(400).json({
                     "⛔Error:":
                         "No coincide id con codigo del producto recibido"
                 });
-                const existsCode = await pm1.productCodeExists(code);
+                const existsCode = await ProductManager.productCodeExists(code);
                 if (existsCode) {
-                    if (!title || !description || !price || !code || !stock) {
+                    if (!title || !description || !price || !code || !stock || !category) {
                         return res.status(400).json({
                             "⛔Error:":
                                 "Producto recibido no es válido. Propiedades vacías o sin definir"
                         });
                     } else {
-                        const newProduct = new Product(title, description, price, code, stock);
+                        const newProduct = new Product(title, description, price, code, stock, category);
                         //Se mantiene el mismo 'id' del Producto, ya que el contructor por defecto asigna uno único
                         newProduct.id = pid;
                         const thumbnailsObjValues = Object.values(prodFound.thumbnails);
                         thumbnailsObjValues.forEach((value) => {
                             newProduct.thumbnails.push(value);
                         });
-                        newProduct.thumbnails = prodFound.thumbnails; //SE APUNTA A MEMORIA Y NO SE DUPLICA
                         if (prodFound.status !== statusNew) {
                             newProduct.status = statusNew;
-                            changesDone.push(`Se modifica el status a ${status}`);
+                            changesDone.push(`Se modifica el status a ${statusNew}`);
+                        }
+                        if (prodFound.title !== title) {
+                            newProduct.title = title;
+                            changesDone.push(`Se modifica el nombre a ${title}`);
                         }
                         if (prodFound.description !== description) {
                             newProduct.description = description;
@@ -116,24 +132,56 @@ productsRouter.put("/products/:pid", uploadMulter.single('thumbnail'), async (re
                             newProduct.stock = stock;
                             changesDone.push(`Se modifica el stock a ${stock}`);
                         }
-                        //Si se elige borrar una foto por su indice por variable 'deleteThumbIndex'
-                        if (deleteThumbIndexParsed && deleteThumbIndexParsed > 0 && deleteThumbIndexParsed <= thumbnailsObjValues.length) {
-                            if (pm1.existsThumbnail(prodFound.thumbnails[deleteThumbIndexParsed - 1])) {
-                                fileToDelete = newProduct.thumbnails[deleteThumbIndexParsed - 1];
-                                await pm1.deleteThumbnail(newProduct.thumbnails[deleteThumbIndexParsed - 1]);
-                            }
-                            newProduct.thumbnails.splice(deleteThumbIndexParsed - 1, 1);
-                            changesDone.push(`Se borro la imagen ${thumbnailsObjValues[deleteThumbIndexParsed - 1]}`);
-                        } else if (deleteThumbIndexParsed && deleteThumbIndexParsed <= 0 || deleteThumbIndexParsed > thumbnailsObjValues.length) {
-                            changesDone.push(`⛔Error: 'deleteThumbIndex' (${deleteThumbIndexParsed}) fuera de rango`);
+                        if (prodFound.category !== category) {
+                            newProduct.category = category;
+                            changesDone.push(`Se modifica la categoria a ${category}`);
                         }
-                        //Si hay foto subida por multer, se agrega al producto especificado por URL
-                        if (req.file) {
-                            newProduct.thumbnails.push(req.file.path);
-                            changesDone.push(`Se agrego el archivo ${req.file.path}`);
+                        // En caso de pasar datos en 'deleteThumbIndex', se eliminan las thumbnails elegidas
+                        let deletedFiles = [];
+                        if (deleteThumbIndexParsed.length > 0) {
+                            // Se eliminan los archivos de imagenes pasados por pa
+                            deleteThumbIndexParsed.forEach(async (indexOriginal) => {
+                                let index = 0;
+                                if (parseInt(indexOriginal) > 0 && parseInt(indexOriginal) <= thumbnailsObjValues.length) {
+                                    index = parseInt(indexOriginal) - 1;
+                                } else {
+                                    changesDone.push(`⛔Error al borrar: indice (${indexOriginal}) fuera de rango`);
+                                }
+                                if (index >= 0 && index < thumbnailsObjValues.length) {
+                                    if (ProductManager.existsThumbnail(prodFound.thumbnails[index])) {
+                                        fileToDelete = prodFound.thumbnails[index];
+                                        deletedFiles.push({ "status": true, "path": fileToDelete })
+                                        await ProductManager.deleteThumbnail(fileToDelete);
+                                    } else {
+                                        deletedFiles.push({ "status": false, "path": prodFound.thumbnails[index] })
+                                    }
+                                }
+                            });
+                            // Se eliminan las referencias a los archivos en el objeto
+                            deletedFiles.forEach(async (deletedFile) => {
+                                if (deletedFile.status) {
+                                    changesDone.push(`Se borro la imagen ${deletedFile.path} de ${prodFound.title} `);
+                                }
+                                else {
+                                    changesDone.push(`Se borro la imagen ${deletedFile.path} del objeto ${prodFound.title} (no se encontraba el archivo)`);
+                                }
+                                await ProductManager.removeThumbnailFromProduct(deletedFile.path, newProduct);
+                            });
                         }
-                        if (changesDone.length === 0) return res.status(201).json({ "✅Producto Actualizado: ": pid, "Cambios Realizados": "No fueron realizados cambios" });
-                        const result = await pm1.updateProduct(newProduct);
+
+                        // Si hay thumbnails subidas por Multer, se agregan al producto
+                        if (req.files.length > 0) {
+                            req.files.forEach((file) => {
+                                newProduct.thumbnails.push(file.path);
+                                changesDone.push(`Se agrego el archivo ${file.path}`);
+                            });
+                        }
+                        if (changesDone.length === 0) return res.status(201).json({ "✅Producto Actualizado: ": pid, "Cambios Realizados": "Ninguno" });
+                        const result = await ProductManager.updateProduct(newProduct);
+                        if (changesDone) {
+                            console.log("🔄Cambios realizados: ");
+                            changesDone.forEach((change) => console.log("- " + change + ""));
+                        }
                         if (result) return res.status(201).json({ "✅Producto Actualizado: ": pid, "Cambios Realizados": changesDone });
                         res.status(500).json({
                             "⛔Error:":
@@ -158,7 +206,7 @@ productsRouter.delete("/products/:pid", async (req, res) => {
     const { pid } = req.params;
     if (pid) {
         try {
-            const result = await pm1.deleteProduct(pid);
+            const result = await ProductManager.deleteProduct(pid);
             if (result) return res.status(200).json({ "✅Producto Eliminado: ": pid });
             return res.status(404).json({ "⛔Error": `Producto id #${pid} no encontrado` });
         } catch (error) {

@@ -124,14 +124,15 @@
 		"id": "924d52b2-df18-4ddd-991e-7d56d7f3a487",
 		"title": "Limonada Natural",
 		"description": "Botella 2500 mL",
-		"price": "450",
+		"price": "850",
 		"thumbnails": [
 			"C:\\Users\\Joaquin\\Desktop\\CODERHOUSE\\Backend I\\PrimeraEntrega\\public\\thumbnails\\1721571098485-269382251-limonada-botella.jpg",
 			"C:\\Users\\Joaquin\\Desktop\\CODERHOUSE\\Backend I\\PrimeraEntrega\\public\\thumbnails\\1721571644161-862162496-limonada-botella2.webp",
 			"C:\\Users\\Joaquin\\Desktop\\CODERHOUSE\\Backend I\\PrimeraEntrega\\public\\thumbnails\\1721572677102-663512390-limonada-botella2.webp"
 		],
 		"code": "abc003",
-		"status": true,
-		"stock": "80"
+		"status": false,
+		"stock": "70",
+		"category": "Bebidas no alcoholicas"
 	}
 ]
