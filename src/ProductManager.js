@@ -2,6 +2,9 @@
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 
+const path = "./src/products.json";
+let products = readProductsFromFile();
+
 // Clase Product, con su correspondiente contructor las props definidas en la consigna
 class Product {
     constructor(title, description, price, code, stock, category) {
@@ -17,74 +20,41 @@ class Product {
     }
 }
 
-const path = "./src/products.json";
-let products = [];
-
 // Clase ProductManager con su constructor tal como se solicitó, con un array 'products' vacío
 class ProductManager {
 
     // Agrega un producto al array 'products'
     static async addProduct(product) {
         let worked = true;
-        if (fs.existsSync(path)) {
-            try {
-                products = JSON.parse(await fs.promises.readFile(path, "utf-8"));
-                let productAlreadyExist = products.find((item) => item.code === product.code);
-                if (!productAlreadyExist) {
-                    try {
-                        products.push(product);
-                        await fs.promises.writeFile(path, JSON.stringify(products, null, "\t"), "utf-8");
-                        console.log(`✅ Producto '${product.title}' agregado exitosamente`);
-                    } catch (error) {
-                        throw new Error(`⛔ Error: ${error.message}`);
-                    }
-                } else {
-                    worked = false;
-                    console.error(`⛔ Error: Código de Producto ya existente (Código:'${productAlreadyExist.code}'|Producto:'${productAlreadyExist.title}')`);
-                }
-                return worked;
-            } catch (error) {
-                throw new Error(`⛔ Error: No se pudo grabar el archivo de Productos.
-   Descripción del error: ${error.message}`);
-            }
-        } else {
+        let productAlreadyExist = products.find((item) => item.code === product.code);
+        if (!productAlreadyExist) {
             try {
                 products.push(product);
-                await fs.promises.writeFile(path, JSON.stringify(products, null, "\t"), "utf-8");
+                await fs.promises.writeFile(path, JSON.stringify(products, null, "\t"), "utf-8", null);
                 console.log(`✅ Producto '${product.title}' agregado exitosamente`);
-                return worked;
             } catch (error) {
-                worked = false;
-                throw new Error(`⛔ Error al crear el archivo JSON de productos: ${error.message}`);
+                throw new Error(`⛔ Error: ${error.message}`);
             }
+        } else {
+            worked = false;
+            console.error(`⛔ Error: Código de Producto ya existente (Código:'${productAlreadyExist.code}'|Producto:'${productAlreadyExist.title}')`);
         }
+        return worked;
     }
 
     // Devuelve el array con todos los productos creados hasta el momento
-    static async getProducts() {
-        if (fs.existsSync(path)) {
-            try {
-                products = JSON.parse(await fs.promises.readFile(path, "utf-8"));
-                return products;
-            } catch (error) {
-                throw new Error(`⛔ Error: No se pudo leer el archivo de Productos.
-   Descripción del error: ${error.message}`);
-            }
-        } else {
-            await fs.promises.writeFile(path, JSON.stringify(products, null, "\t"), "utf-8");
-            return products;
-        }
+    static getProducts() {
+        return products;
     }
 
     // En caso de encontrarlo, devuelve un objeto 'Producto' de acuerdo a id proporcionado por argumento.
     // En caso de no encontrarlo, imprime error en la consola.
-    static async getProductById(id) {
+    static getProductById(id) {
         let productFound = undefined;
         try {
-            products = await this.getProducts();
             products.forEach(product => {
                 if (product.id === id) productFound = product;
-            })
+            });
             if (productFound === undefined) {
                 console.error(`⛔ Error: Producto id #${id} no encontrado`);
             }
@@ -99,7 +69,6 @@ class ProductManager {
     static async getProductByCode(code) {
         let productFound = undefined;
         try {
-            products = await this.getProducts();
             products.forEach(product => {
                 product.code === code ? productFound = product : null;
             })
@@ -116,7 +85,6 @@ class ProductManager {
     static async updateProduct(product) {
         let result = false;
         try {
-            products = await this.getProducts();
             const index = products.findIndex(p => p.id === product.id);
             products[index] = product;
             await fs.promises.writeFile(path, JSON.stringify(products, null, "\t"), "utf-8");
@@ -150,7 +118,6 @@ class ProductManager {
 
     static async productCodeExists(productCode) {
         try {
-            products = await this.getProducts();
             let productCodeFound = false;
             products.forEach(product => {
                 if (product.code === productCode) productCodeFound = true;
@@ -163,7 +130,6 @@ class ProductManager {
 
     static async productIdExists(productId) {
         try {
-            products = await this.getProducts();
             let productIdFound = false;
             products.forEach(product => {
                 if (product.id === productId) productIdFound = true;
@@ -174,7 +140,7 @@ class ProductManager {
         }
     }
 
-    existsThumbnail(path) {
+    static existsThumbnail(path) {
         try {
             let exists = false;
             fs.existsSync(path) ? exists = true : exists = false;
@@ -210,4 +176,17 @@ class ProductManager {
     }
 }
 
-module.exports = { Product, ProductManager }
+function readProductsFromFile() {
+    if (fs.existsSync(path)) {
+        try {
+            return JSON.parse(fs.readFileSync(path, "utf-8"));
+        } catch (error) {
+            throw new Error(`⛔ Error: No se pudo leer el archivo de Productos.
+Descripción del error: ${error.message}`);
+        }
+    } else {
+        return [];
+    }
+}
+
+module.exports = { Product, ProductManager, products }

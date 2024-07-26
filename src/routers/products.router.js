@@ -21,12 +21,12 @@ const productsRouter = Router();
 
 productsRouter.get("/products", async (req, res) => {
     const { limit } = req.query;
-    if (!limit || limit < 1) {
+    if (!limit || parseInt(limit) === 0) {
         const products = await ProductManager.getProducts();
         if (products.length === 0) return res.status(200).json({ "Productos": "Sin productos creados" });
         return res.status(200).json({ "Productos": products });
     }
-    if (!parseInt(limit)) return res.status(400).json({ "⛔Error": "Límite establecido no válido" })
+    if (!parseInt(limit) || limit < 1) return res.status(400).json({ "⛔Error": "Límite establecido no válido" })
     const result = await ProductManager.getProducts();
     const products = result;
     const filteredProducts = products.slice(0, limit);
@@ -47,22 +47,23 @@ productsRouter.post("/products", uploadMulter.array('thumbnails'), async (req, r
     if (!title || !description || !price || !code || !stock || !category) {
         return res.status(400).json({
             "⛔Error:":
-                "Producto recibido no es válido. Propiedades vacías o sin definir"
+                "Petición incorrecta"
         });
     } else {
         try {
             const prod1 = new Product(title, description, parseInt(price), code, parseInt(stock), category);
             // Si hay thumbnails subidas por Multer, se agregan al producto
-            if (req.files.length > 0) {
+            if (req.files && req.files.length > 0) {
                 req.files.forEach((file) => {
                     prod1.thumbnails.push(file.path);
                 });
             }
             const result = await ProductManager.addProduct(prod1);
             if (result) return res.status(201).json({ "✅Producto Creado: ": prod1.id });
+            const prodFound = await ProductManager.getProductByCode(prod1.code);
             return res.status(400).json({
                 "⛔Error:":
-                    "Producto ya existente u ocurrió un problema al guardarlo en el FS"
+                    `Producto ya existente: ${prodFound.title} (codigo: ${prodFound.code})`
             });
         } catch (error) {
             return res.status(500).json({ "⛔Error interno:": error.message });
@@ -70,9 +71,10 @@ productsRouter.post("/products", uploadMulter.array('thumbnails'), async (req, r
     }
 });
 
-/* El siguiente endpoint (put) admite de forma opcional que se envíe el valor 'deleteThumbIndex" en el body,
-   el cual corresponde a la posición (a partir del 1) de cierta thumbnail que se desee borrar.
-   Unicos status permitidos: true o false. Valor por defecto siempre es true, a menos que se elija false.*/
+/* El siguiente endpoint (put) admite de forma opcional que se envíe el argumento 'deleteThumbIndex'
+   en el body, el cual corresponde a la posición (a partir de 1) de cierta thumbnail que se desee borrar.
+   Se pueden enviar también los valores  'deleteThumbIndex' como un array.
+   Unicos status permitidos: true o false. Valor por defecto siempre es true, a menos que se especifique false.*/
 
 productsRouter.put("/products/:pid", uploadMulter.array('thumbnails'), async (req, res) => {
     const changesDone = [];
@@ -188,17 +190,14 @@ productsRouter.put("/products/:pid", uploadMulter.array('thumbnails'), async (re
                                 "El Producto '" + pid + "' no pudo ser actualizado"
                         });
                     }
-                } else {
-                    return res.status(404).json({ "⛔Error:": "Producto recibido no existe en la base" });
                 }
-            } else {
-                return res.status(404).json({ "⛔Error:": "Producto recibido no existe en la base" });
             }
+            return res.status(404).json({ "⛔Error:": "Producto recibido no existe en la base" });
         } catch (error) {
             return res.status(500).json({ "⛔Error interno:": `${error}, ${error.message}` });
         }
     } else {
-        return res.status(400).json({ "⛔Error:": "no se recibio un id de producto" });
+        return res.status(400).json({ "⛔Error:": "petición incorrecta" });
     }
 });
 

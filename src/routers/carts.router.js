@@ -1,14 +1,15 @@
 // Se realizan los imports mediante 'require', de acuerdo a lo visto en clase
 const { Router } = require('express');
 const { CartManager } = require('../CartManager');
+const { ProductManager } = require('../ProductManager');
 
 const cartsRouter = Router();
 
-cartsRouter.get("/carts/:cid", async (req, res) => {
+cartsRouter.get("/carts/:cid", (req, res) => {
     const { cid } = req.params;
     if (cid) {
         try {
-            const cart = await CartManager.getCartById(cid);
+            const cart =  CartManager.getCartById(cid);
             if (cart) return res.status(200).json({ "Productos": cart.products });
             return res.status(404).json({ "⛔Error": `Carrito id '${cid}' no encontrado` });
         } catch (error) {
@@ -39,7 +40,8 @@ cartsRouter.post("/carts/:cid/product/:pid", async (req, res) => {
     if (cid && pid) {
         try {
             const result = await CartManager.addProductToCart(cid, pid, quantity);
-            if (result) return res.status(200).json({ "✅Cantidad agregada": `+${quantity} de producto #'${pid}' al carrito #'${cid}'` });
+            const prodAdded = ProductManager.getProductById(pid);
+            if (result) return res.status(200).json({ "✅Cantidad agregada": `+${quantity} de '${prodAdded.title}' al carrito #${cid}` });
             if (result === undefined) return res.status(500).json({ "⛔Error": "Error: debe crear primero algún carrito (POST '/api/carts/')" });
             return res.status(404).json({ "⛔Error": `Carrito id '${cid} o producto ${pid} no encontrado` });
         } catch (error) {
