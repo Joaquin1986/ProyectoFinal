@@ -3,11 +3,11 @@ const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 const { ProductManager } = require('./ProductManager.js');
 
-/*Se definen las variables que se utilizarán en los metodos estaticos de la Clase CartManager
-  Se lee inicialmente el archivo de products de forma síncrona (así no se continúa hasta tenerlos cargados) */
+/* Si bien cuando implementemos BD la funcion de lectura sera asincronica, como en esta primer
+   pre-entrega trabajamos con archivos, se lee de forma sincronica solamente la carga inicial de carritos.
+   El resto de las operaciones se ejecutan de forma asincrona*/
 const path = "./src/carts.json";
 let carts = readCartsFromFile();
-
 
 // Clase Cart, con su correspondiente contructor las props definidas en la consigna
 class Cart {

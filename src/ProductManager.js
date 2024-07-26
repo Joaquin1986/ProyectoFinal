@@ -2,8 +2,11 @@
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 
+/* Si bien se que, cuando implementemos BD, la funcion de lectura sera asincronica, como en esta primer
+   pre-entrega trabajamos con archivos, se lee de forma sincronica solamente la carga inicial de productos.
+   El resto de las operaciones se ejecutan de forma asincrona*/
 const path = "./src/products.json";
-let products = readProductsFromFile();
+let products = readProductsFromFile(path);
 
 // Clase Product, con su correspondiente contructor las props definidas en la consigna
 class Product {
@@ -176,10 +179,10 @@ class ProductManager {
     }
 }
 
-function readProductsFromFile() {
-    if (fs.existsSync(path)) {
+function readProductsFromFile(filePath) {
+    if (fs.existsSync(filePath)) {
         try {
-            return JSON.parse(fs.readFileSync(path, "utf-8"));
+            return JSON.parse(fs.readFileSync(filePath, "utf-8"));
         } catch (error) {
             throw new Error(`⛔ Error: No se pudo leer el archivo de Productos.
 Descripción del error: ${error.message}`);
