@@ -1,0 +1,31 @@
+<div class="container">
+    <h1 class="hProd">Listado de Productos 🛒</h1>
+    {{#if products}}
+    <h2 class="hProd">Total: {{quantity}}</h2>
+    <div id="producsGrid">
+        {{#each products}}
+        <div class="product">
+            <article class="articleProducto">
+                <header>
+                    <h3 class="hProd">{{title}}📦</h3>
+                </header>
+                <p class="pProd"> Código: {{code}}</p>
+                <hr />
+                <p class="pProd">Descripción: {{description}}</p>
+                <hr />
+                <p class="pProd">Estado: {{#if status}}Activo{{else}}Desactivado{{/if}}</p>
+                <hr />
+                <p class="pProd">Stock: {{stock}}</p>
+                <hr />
+                <p class="pProd">Categoría: {{category}}</p>
+                <footer>
+                    <h4 class="hProd">Precio: ${{price}}</h4>
+            </article>
+        </div>
+        {{/each}}
+    </div>
+    {{else}}
+    <h2>No hay productos para mostrar ⛔</h2>
+
+    {{/if}}
+</div>

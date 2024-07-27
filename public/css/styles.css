@@ -1,0 +1,16 @@
+#swal2-input {
+    max-width: 550px;
+}
+
+.hProd {
+    text-align: center;
+}
+
+#producsGrid {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.product {
+    padding: 15px;
+}

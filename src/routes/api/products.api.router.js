@@ -1,21 +1,7 @@
 // Se realizan los imports mediante 'require', de acuerdo a lo visto en clase
 const { Router } = require('express');
-const multer = require('multer');
-const path = require('path');
-const { Product, ProductManager } = require('../ProductManager.js');
-
-/* Se configura Multer para que los guarde en el directorio 'public/thumbnails' y que mantenga el
-nombre de los archivos, agregando un sufijo para asegurar que sea únicos */
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, path.join(__dirname, '../../public/thumbnails'));
-    },
-    filename: function (req, file, cb) {
-        const uniquePreffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, uniquePreffix + '-' + file.originalname);
-    }
-})
-const uploadMulter = multer({ storage: storage })
+const { Product, ProductManager } = require('../../controllers/ProductManager');
+const { uploadMulter } = require('../../utils/utils');
 
 const productsRouter = Router();
 

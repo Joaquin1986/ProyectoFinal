@@ -2,12 +2,13 @@
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 const { ProductManager } = require('./ProductManager.js');
+const { readJsonDataFromFile } = require('../utils/utils.js')
 
 /* Si bien cuando implementemos BD la funcion de lectura sera asincronica, como en esta primer
    pre-entrega trabajamos con archivos, se lee de forma sincronica solamente la carga inicial de carritos.
    El resto de las operaciones se ejecutan de forma asincrona*/
-const path = "./src/carts.json";
-let carts = readCartsFromFile();
+const file = 'carts.json';
+let carts = readJsonDataFromFile(file);
 
 // Clase Cart, con su correspondiente contructor las props definidas en la consigna
 class Cart {
