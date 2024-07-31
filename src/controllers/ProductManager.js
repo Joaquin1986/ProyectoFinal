@@ -106,6 +106,7 @@ class ProductManager {
             if (prodIndex === -1) return false;
             products[prodIndex].status = status;
             await fs.promises.writeFile(path, JSON.stringify(products, null, "\t"), "utf-8");
+            console.log(`✅ Producto id#'${products[prodIndex].id}' ahora tiene status "${status}"`);
             return true;
         } catch (error) {
             throw new Error(`⛔ Error: No se pudo actualizar el producto => error: ${error.message}`);

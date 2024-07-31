@@ -23,7 +23,6 @@
     text-align: center;
 }
 
-.disableProductButton,
-.enableProductButton {
-    margin-right: 10px;
+.statusProductButton {
+    margin-right: 20px;
 }
