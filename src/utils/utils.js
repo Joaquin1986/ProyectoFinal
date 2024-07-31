@@ -1,6 +1,9 @@
 const path = require('path');
 const multer = require('multer');
 const fs = require('fs');
+
+const productsPath = path.join(__dirname, '../data/products.json');
+const cartsPath = path.join(__dirname, '../data/carts.json');
 const publicPath = path.join(__dirname, '../../public');
 const viewsPath = path.join(__dirname, '../views');
 const thumbnailsPath = path.join(__dirname, '../public/img');
@@ -32,4 +35,4 @@ Descripción del error: ${error.message}`);
     }
 }
 
-module.exports = { uploadMulter, publicPath, viewsPath, readJsonDataFromFile };
+module.exports = { uploadMulter, publicPath, viewsPath, productsPath, cartsPath, readJsonDataFromFile };

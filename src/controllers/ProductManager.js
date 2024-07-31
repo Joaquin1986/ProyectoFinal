@@ -1,7 +1,7 @@
 // Se realizan los imports mediante 'require', de acuerdo a lo visto en clase
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
-const { readJsonDataFromFile } = require('../utils/utils.js')
+const { readJsonDataFromFile, productsPath: path } = require('../utils/utils.js')
 
 /* Si bien se que, cuando implementemos BD, la funcion de lectura sera asincronica, como en esta primer
    pre-entrega trabajamos con archivos, se lee de forma sincronica solamente la carga inicial de productos.
@@ -100,10 +100,22 @@ class ProductManager {
         }
     }
 
+    static async productStatus(productId, status) {
+        try {
+            const prodIndex = products.findIndex(product => product.id === productId);
+            if (prodIndex === -1) return false;
+            products[prodIndex].status = status;
+            await fs.promises.writeFile(path, JSON.stringify(products, null, "\t"), "utf-8");
+            return true;
+        } catch (error) {
+            throw new Error(`⛔ Error: No se pudo actualizar el producto => error: ${error.message}`);
+        }
+    }
+
     static async deleteProduct(id) {
         let result = false;
         try {
-            const productGotten = await this.getProductById(id);
+            const productGotten = this.getProductById(id);
             if (productGotten === undefined) {
                 console.error(`⛔ Error: No se pudo borrar el producto`);
                 return result;

@@ -1,9 +1,5 @@
-#swal2-input {
-    max-width: 550px;
-}
-
 .hProd {
-    text-align: center;
+    text-align: center; 
 }
 
 #producsGrid {
@@ -11,6 +7,23 @@
     flex-wrap: wrap;
 }
 
+.articleProducto {
+    transition: 0.3s;
+}
+.articleProducto:hover {
+    border: 1px;
+    border-style: solid;
+}
+
 .product {
     padding: 15px;
+}
+
+.footerProduct {
+    text-align: center;
+}
+
+.disableProductButton,
+.enableProductButton {
+    margin-right: 10px;
 }

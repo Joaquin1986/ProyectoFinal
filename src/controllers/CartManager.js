@@ -2,7 +2,7 @@
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 const { ProductManager } = require('./ProductManager.js');
-const { readJsonDataFromFile } = require('../utils/utils.js')
+const { readJsonDataFromFile, productsPath: path } = require('../utils/utils.js')
 
 /* Si bien cuando implementemos BD la funcion de lectura sera asincronica, como en esta primer
    pre-entrega trabajamos con archivos, se lee de forma sincronica solamente la carga inicial de carritos.
