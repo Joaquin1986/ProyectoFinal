@@ -11,7 +11,11 @@ const initSocket = async (httpServer) => {
         });
         socketClient.on('delete', async (product) => {
             const result = await ProductManager.deleteProduct(product)
-            socketServer.emit('delete', product, result, socketClient.id);
+            socketServer.emit('delete', product, result);
+        });
+        socketClient.on('newProduct', (productId) => { //luego sera async
+            const newProduct = ProductManager.getProductById(productId)  //luego sera con await
+            socketServer.emit('newProduct', newProduct, socketClient.id);
         });
     });
 };

@@ -19,9 +19,9 @@ productsRouter.get("/products", async (req, res) => {
     return res.status(200).json(filteredProducts);
 });
 
-productsRouter.get("/products/:pid", async (req, res) => {
+productsRouter.get("/products/:pid", (req, res) => { //luego sera async
     const { pid } = req.params;
-    const product = await ProductManager.getProductById(pid)
+    const product = ProductManager.getProductById(pid) //luego tendra await
     if (product) return res.status(200).json(product);
     return res.status(404).json({ "⛔Error": `Producto id #${pid} no encontrado` });
 });
@@ -45,7 +45,10 @@ productsRouter.post("/products", uploadMulter.array('thumbnails'), async (req, r
                 });
             }
             const result = await ProductManager.addProduct(prod1);
-            if (result) return res.status(201).json({ "✅Producto Creado: ": prod1.id });
+            if (result) {
+                console.log("✅Producto Creado --> id#" + prod1.id);
+                return res.status(201).json({ "productId": prod1.id });
+            }
             const prodFound = await ProductManager.getProductByCode(prod1.code);
             return res.status(400).json({
                 "⛔Error:":

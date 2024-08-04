@@ -131,8 +131,30 @@
 			"C:\\Users\\Joaquin\\Desktop\\CODERHOUSE\\Backend I\\PrimeraEntrega\\public\\thumbnails\\1721572677102-663512390-limonada-botella2.webp"
 		],
 		"code": "abc003",
-		"status": false,
+		"status": true,
 		"stock": "70",
 		"category": "Bebidas no alcoholicas"
+	},
+	{
+		"id": "049f7030-c3fc-4d65-b829-9a69147391e1",
+		"title": "Jugo de Remolacha",
+		"description": "Botella 1L",
+		"price": 380,
+		"thumbnails": [],
+		"code": "ABC365",
+		"status": true,
+		"stock": 95,
+		"category": "Bebidas no alcoholicas"
+	},
+	{
+		"id": "6bf98fe4-a9c5-47fc-967f-747a3ac1f982",
+		"title": "Prueba",
+		"description": "Prueba",
+		"price": null,
+		"thumbnails": [],
+		"code": "Prueba",
+		"status": true,
+		"stock": null,
+		"category": "Prueba"
 	}
 ]

@@ -1,25 +1,26 @@
 <div class="container">
-    <h1 class="hProd">Listado de Productos en TIEMPO REAL ⌚ </h1>
+    <h1 class="hProd">Productos en TIEMPO REAL ⌚ </h1>
     {{#if products}}
     <h2 class="hProd" id="h2Total">Total: {{quantity}}</h2>
-    <div id="producsGrid">
+    <div id="productsGrid">
+        <div class="addButtonDiv"><button id="addButton">➕</button></div>
         {{#each products}}
         <div class="product" id="product-{{id}}">
             <article class="articleProducto">
                 <header>
                     <h3 class="hProd" id="title-{{id}}">{{title}}📦</h3>
                 </header>
-                <p class="pProd" id="code-{{id}}"> Código: {{code}}</p>
+                <p class="pProd" id="code-{{id}}"><u> Código:</u> {{code}}</p>
                 <hr />
-                <p class="pProd" id="description-{{id}}">Descripción: {{description}}</p>
+                <p class="pProd" id="description-{{id}}"><u>Descripción:</u> {{description}}</p>
                 <hr />
-                <p class="pProd" id="status-{{id}}">Estado: {{#if status}}Activo{{else}}Desactivado{{/if}}</p>
+                <p class="pProd" id="status-{{id}}"><u>Estado:</u> {{#if status}}Activo{{else}}Desactivado{{/if}}</p>
                 <hr />
-                <p class="pProd" id="status-{{id}}">Stock: {{stock}}</p>
+                <p class="pProd" id="status-{{id}}"><u>Stock:</u> {{stock}}</p>
                 <hr />
-                <p class="pProd" id="status-{{id}}">Categoría: {{category}}</p>
+                <p class="pProd" id="status-{{id}}"><u>Categoría:</u> {{category}}</p>
                 <hr />
-                <p class="pProd" id="status-{{id}}">Precio: {{price}}</p>
+                <p class="pProd" id="status-{{id}}"><u>Precio:</u> ${{price}}</p>
                 <footer class="footerProduct">
                     {{#if status}}
                     <button class="statusProductButton" id="status-disable-{{id}}">Desact.🔒</button>

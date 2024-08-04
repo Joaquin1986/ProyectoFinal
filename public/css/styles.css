@@ -1,22 +1,44 @@
 .hProd {
-    text-align: center; 
+    text-align: center;
 }
 
-#producsGrid {
+#productsGrid {
     display: flex;
     flex-wrap: wrap;
+    position: relative;
 }
 
-.articleProducto {
-    transition: 0.3s;
+.addButtonDiv {
+    position: fixed;
+    right: 25px;
+    bottom: 35px;
 }
-.articleProducto:hover {
-    border: 1px;
-    border-style: solid;
+
+#addButton {
+    border-radius: 80px;
+    font-size: larger;
+    transition: 0.4s;
+}
+
+#addButton:hover,
+.deleteProductButton:hover,
+.statusProductButton:hover {
+    border-color: #c2c7d0;
+    border-width: 1px;
+    background-color: #138bcc;
 }
 
 .product {
     padding: 15px;
+}
+
+.articleProducto {
+    transition: 0.2s;
+}
+
+.articleProducto:hover {
+    border: 1px;
+    border-style: groove;
 }
 
 .footerProduct {
@@ -25,4 +47,13 @@
 
 .statusProductButton {
     margin-right: 20px;
+}
+
+.swal2-title,
+.swal2-html-container,
+.swal2-popup,
+.swal2-validation-message,
+input {
+    color: #c2c7d0;
+    background-color: #13171f;
 }
