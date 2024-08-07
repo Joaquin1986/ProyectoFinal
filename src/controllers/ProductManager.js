@@ -1,7 +1,7 @@
 // Se realizan los imports mediante 'require', de acuerdo a lo visto en clase
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
-const { readJsonDataFromFile, productsPath: path } = require('../utils/utils.js')
+const { readJsonDataFromFile, productsPath: path, thumbnailsPath } = require('../utils/utils.js');
 
 /* Si bien se que, cuando implementemos BD, la funcion de lectura sera asincronica, como en esta primer
    pre-entrega trabajamos con archivos, se lee de forma sincronica solamente la carga inicial de productos.
@@ -11,14 +11,17 @@ let products = readJsonDataFromFile(file);
 
 // Clase Product, con su correspondiente contructor las props definidas en la consigna
 class Product {
-    constructor(title, description, price, code, stock, category) {
+    constructor(title, description, price, code, status, stock, category) {
+        if (status === undefined) {
+            status = true;
+        }
         this.id = uuidv4();
         this.title = title;
         this.description = description;
         this.price = price;
         this.thumbnails = [];
         this.code = code;
-        this.status = true;
+        this.status = status;
         this.stock = stock;
         this.category = category;
     }
@@ -113,6 +116,16 @@ class ProductManager {
         }
     }
 
+    static async deleteThumbnail(path) {
+        try {
+            if (this.existsThumbnail(path)) {
+                await fs.promises.unlink(path);
+            }
+        } catch (error) {
+            throw new Error(`⛔ Error: no se pudo borrar la thumbnail ${path} => ${error.message}`);
+        }
+    }
+
     static async deleteProduct(id) {
         let result = false;
         try {
@@ -122,6 +135,10 @@ class ProductManager {
                 return result;
             } else {
                 const index = products.findIndex(product => product.id === id);
+                // Se borran las imagenes del producto previo a borrar el objeto
+                for (let count = 0; count < Object.values(products[index].thumbnails).length; count++) {
+                    await this.deleteThumbnail(thumbnailsPath + "\\" + products[index].thumbnails[count].split('\\img\\thumbnails\\')[1]);
+                }
                 products.splice(index, 1);
                 await fs.promises.writeFile(path, JSON.stringify(products, null, "\t"), "utf-8");
                 console.log(`✅ Producto #${id} eliminado exitosamente`);
@@ -164,16 +181,6 @@ class ProductManager {
             return exists;
         } catch (error) {
             throw new Error(`⛔ Error: no se pudo verificar si existe la thumbnail ${path} => ${error.message}`);
-        }
-    }
-
-    static async deleteThumbnail(path) {
-        try {
-            if (this.existsThumbnail(path)) {
-                await fs.promises.unlink(path);
-            }
-        } catch (error) {
-            throw new Error(`⛔ Error: no se pudo borrar la thumbnail ${path} => ${error.message}`);
         }
     }
 

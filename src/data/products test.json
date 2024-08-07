@@ -5,9 +5,10 @@
 		"description": "Botella 1L",
 		"price": "450",
 		"thumbnails": [
-			"\\img\\thumbnails\\1722917550472-516739140-refresco-cola.jpg",
-			"\\img\\thumbnails\\1722917550474-114171363-Coca-Cola-Retornable-1-L.webp",
-			"\\img\\thumbnails\\1722917550474-998670030-Refresco-COCA-COLA-1-L-2.webp"
+			"https://tatauy.vtexassets.com/arquivos/ids/618519/Coca-Cola-Retornable-1-L-Incluye-Envase-2-6012.jpg?v=638260041896870000",
+			"https://distribuidoranikoll.com/wp-content/uploads/2023/04/Diseno-sin-titulo-4-1.jpg",
+			"https://discouy.vtexassets.com/arquivos/ids/1779705/Refresco-COCA-COLA-1-L-2.jpg?v=638507826700100000",
+			"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-sybXkeSR2RCxgLcUYIfr0mPGDE7RJqLF9Q&s"
 		],
 		"code": "abc123",
 		"status": true,
@@ -17,17 +18,13 @@
 	{
 		"id": "8b9101ea-90a1-4bec-8aa3-ab61a7c04d89",
 		"title": "Vino Tinto",
-		"description": "Botella de 750mL",
-		"price": "1350",
-		"thumbnails": [
-			"\\img\\thumbnails\\1723007698139-827109376-botella-de-vino-tinto-.jpg",
-			"\\img\\thumbnails\\1723008178447-505887752-red-wine3.jpg",
-			"\\img\\thumbnails\\1723008178448-221355935-red-wine4.jpg"
-		],
+		"description": "Botella 750mL",
+		"price": "870",
+		"thumbnails": [],
 		"code": "abc124",
 		"status": true,
-		"stock": "50",
-		"category": "Vinos"
+		"stock": "20",
+		"category": "Bebidas alcoholicas"
 	},
 	{
 		"id": "ed857714-c484-4fdc-8277-2ce4377349aa",

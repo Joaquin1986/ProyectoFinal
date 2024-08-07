@@ -2,8 +2,10 @@
 const { Router } = require('express');
 const { Product, ProductManager } = require('../../controllers/ProductManager');
 const { uploadMulter } = require('../../utils/utils');
+const path = require('path');
 
 const productsRouter = Router();
+const maxFilesAllowed = 5;
 
 productsRouter.get("/products", async (req, res) => {
     const { limit } = req.query;
@@ -29,19 +31,25 @@ productsRouter.get("/products/:pid", (req, res) => { //luego sera async
 // Al siguiente endpoint (POST) se le puede pasar un array llamado 'thumbnails" por Multer
 productsRouter.post("/products", uploadMulter.array('thumbnails'), async (req, res) => {
     const { body } = req;
-    const { title, description, price, code, stock, category } = body;
-    if (!title || !description || !price || !code || !stock || !category) {
+    const { title, description, price, code, status, stock, category } = body;
+    let newStatus = true;
+    if (!title || !description || !parseInt(price) || !code || !parseInt(stock) || !category ||
+        req.files.length > maxFilesAllowed) {
         return res.status(400).json({
             "⛔Error:":
-                "Petición incorrecta"
+                "Petición incorrecta (los valores proporcionados no son los esperados)"
         });
     } else {
         try {
-            const prod1 = new Product(title, description, parseInt(price), code, parseInt(stock), category);
+            if (status && status.toLowerCase() === 'false') {
+                newStatus = false;
+            }
+            const prod1 = new Product(title, description, parseInt(price), code, newStatus, parseInt(stock), category);
             // Si hay thumbnails subidas por Multer, se agregan al producto
             if (req.files && req.files.length > 0) {
                 req.files.forEach((file) => {
-                    prod1.thumbnails.push(file.path);
+                    const newPath = file.path.split("public")[1];
+                    prod1.thumbnails.push(newPath);
                 });
             }
             const result = await ProductManager.addProduct(prod1);
@@ -83,7 +91,11 @@ productsRouter.put("/products/:pid", uploadMulter.array('thumbnails'), async (re
             if (status && status.toLowerCase() === "true") statusNew = true;
             existsId = await ProductManager.productIdExists(pid);
             if (existsId) {
-                const prodFound = await ProductManager.getProductById(pid);
+                if (req.files.length > maxFilesAllowed) return res.status(400).json({
+                    "⛔Error:":
+                        `Se superó el límite de imágenes: ${maxFilesAllowed}`
+                });
+                const prodFound = ProductManager.getProductById(pid); //luego será con AWAIT
                 if (prodFound.code !== code) return res.status(400).json({
                     "⛔Error:":
                         "No coincide id con codigo del producto recibido"
@@ -161,10 +173,11 @@ productsRouter.put("/products/:pid", uploadMulter.array('thumbnails'), async (re
                         }
 
                         // Si hay thumbnails subidas por Multer, se agregan al producto
-                        if (req.files.length > 0) {
+                        if (req.files && req.files.length > 0) {
                             req.files.forEach((file) => {
-                                newProduct.thumbnails.push(file.path);
-                                changesDone.push(`Se agrego el archivo ${file.path}`);
+                                const newPath = file.path.split("public")[1];
+                                newProduct.thumbnails.push(newPath);
+                                changesDone.push(`Se agrego el archivo ${newPath}`);
                             });
                         }
                         if (changesDone.length === 0) return res.status(201).json({ "✅Producto Actualizado: ": pid, "Cambios Realizados": "Ninguno" });

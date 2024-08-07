@@ -5,9 +5,8 @@ const realTimeProductsViewRouter = Router();
 
 realTimeProductsViewRouter.get('/realTimeProducts', async (req, res) => {
     const products = ProductManager.getProducts();
-    const quantity = Object.keys(products).length;
     const title = 'APP -> Listado en Tiempo Real de Productos⌚📦';
-    res.render('realTimeProducts', { title: title, products: products, quantity: quantity });
+    res.render('realTimeProducts', { title: title, products: products });
 });
 
 module.exports = realTimeProductsViewRouter;

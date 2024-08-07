@@ -6,7 +6,7 @@ const productsPath = path.join(__dirname, '../data/products.json');
 const cartsPath = path.join(__dirname, '../data/carts.json');
 const publicPath = path.join(__dirname, '../../public');
 const viewsPath = path.join(__dirname, '../views');
-const thumbnailsPath = path.join(__dirname, '../public/img');
+const thumbnailsPath = path.join(__dirname, '../../public/img/thumbnails');
 
 /* Se configura Multer para que los guarde en el directorio 'public/thumbnails' y que mantenga el
 nombre de los archivos, agregando un sufijo para asegurar que sea únicos */
@@ -35,4 +35,4 @@ Descripción del error: ${error.message}`);
     }
 }
 
-module.exports = { uploadMulter, publicPath, viewsPath, productsPath, cartsPath, readJsonDataFromFile };
+module.exports = { uploadMulter, publicPath, viewsPath, productsPath, cartsPath, thumbnailsPath, readJsonDataFromFile };

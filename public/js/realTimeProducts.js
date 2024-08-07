@@ -5,32 +5,30 @@ const deleteButtons = document.getElementsByClassName('deleteProductButton');
 
 const basicToast = {
     toast: true,
-    position: "bottom-end",
+    position: "top-end",
     showConfirmButton: false,
-    timer: 10000,
+    timer: 1500,
     timerProgressBar: false,
-    color: 'var(--pico-color)'
 };
 
-const errorToast = Swal.mixin({ ...basicToast, background: '#fc0000' });
+const errorToast = Swal.mixin({ ...basicToast, background: '#bb0606' });
 
 const successToast = Swal.mixin({ ...basicToast, background: '#097e0f' });
 
 const addProductButton = document.getElementById('addButton');
 
 addProductButton.addEventListener('click', async (e) => {
-    let bodyContent = new FormData();
-    let result;
     await Swal.fire({
-        title: "Crear Nuevo Producto",
         html: `
-          <form id="newProdForm">
+        <article>
+         <header>
+            <h3> Crear Nuevo Producto 📦</h3>
+         </header>
           <input type="text" name="title" aria-label="Title" placeholder="Nombre del producto(*)" id="title" required>
           <input type="text" name="description" aria-label="description" placeholder="Descripción del producto(*)" id="description" required>
           <input type="text" name="price" aria-label="price" placeholder="Precio del producto(*)" id="price" required>
-          <input type="file" name="thumbnails" placeholder="Imagen del producto" class="thumbnails" id="fileInput" required>
           <input type="text" name="code" aria-label="Code" placeholder="Código del producto(*)" id="code" required>
-          <select name="favorite-cuisine" id="status" aria-label="Select your favorite cuisine..." required>
+          <select name="status" id="status" aria-label="Estado del Producto" required>
           <option selected disabled value="" required>
           Estado del Producto(*)
           </option>
@@ -39,54 +37,24 @@ addProductButton.addEventListener('click', async (e) => {
                 </select>
           <input type="text" name="stock" aria-label="Stock" placeholder="Stock del producto(*)" id="stock" required>
           <input type="text" name="category" aria-label="Category" placeholder="Categoría del producto(*)" id="category" required>
-          </form>
+          <div id="filesDiv">
+          <h5 id="prodImagesH5">Imagenes del Producto 📷</h5>
+            <button id="addFileField" onClick="addFileField()">➕</button>
+            <button id="removeFileField" onClick="removeFileField()">➖</button>
+          </div>
+          <footer>
+          <input type="button" value="Crear Producto" onClick="preConfirm()">
+          <input type="button" class="secondary" value="Cancelar" onClick="Swal.close()">
+          </footer>
+        </article>
         `,
-        confirmButtonText: 'Crear Producto',
+        showConfirmButton: false,
         focusConfirm: false,
-        preConfirm: () => {
-            if (!document.getElementById("title").value ||
-                !document.getElementById("description").value ||
-                !document.getElementById("price").value ||
-                !document.getElementById("code").value ||
-                !document.getElementById("status").value ||
-                !document.getElementById("stock").value ||
-                !document.getElementById("category").value) {
-                Swal.showValidationMessage(`Debes ingresar todos los campos requeridos (*)`)
-            } else {
-                const fileInput = document.getElementById("fileInput");
-                result = {
-                    "title": document.getElementById("title").value,
-                    "description": document.getElementById("description").value,
-                    "price": document.getElementById("price").value,
-                    "code": document.getElementById("code").value,
-                    "status": document.getElementById("status").value,
-                    "stock": document.getElementById("stock").value,
-                    "category": document.getElementById("category").value,
-                };
-                fileInput.files.length > 0 ?
-                    result = { ...result, "thumbnails": window.URL.createObjectURL(fileInput.files[0]) } :
-                    result = { ...result, "thumbnails": [] };
-                return result;
-            }
-        }
+        showCloseButton: false
     });
-    if (result) {
-        bodyContent.append("title", result.title);
-        bodyContent.append("description", result.description);
-        bodyContent.append("price", result.price);
-        bodyContent.append("code", result.code);
-        bodyContent.append("status", result.status);
-        bodyContent.append("stock", result.stock);
-        bodyContent.append("category", result.category);
-        bodyContent.append("thumbnails", result.thumbnails);
-        const newProductId = await createProduct("http://localhost:8080/api/products", bodyContent);
-        if (newProductId) {
-            socket.emit('newProduct', newProductId);
-        }
-    }
 });
 
-for (i = 0; i < Object.keys(statusButtons).length; i++) {
+for (let i = 0; i < Object.keys(statusButtons).length; i++) {
     statusButtons[i].addEventListener('click', (event) => {
         let status = false;
         productId = event.target.id.split('status-disable-')[1];
@@ -98,7 +66,7 @@ for (i = 0; i < Object.keys(statusButtons).length; i++) {
     });
 }
 
-for (i = 0; i < Object.keys(deleteButtons).length; i++) {
+for (let i = 0; i < Object.keys(deleteButtons).length; i++) {
     deleteButtons[i].addEventListener('click', (event) => {
         productId = event.target.id.split('delete-')[1];
         if (!productId) {
@@ -119,7 +87,7 @@ socket.on('status', (productId, result, status, clientId) => {
         };
         // Se realizó el cambio de status
         let text = document.getElementById('status-' + productId);
-        status ? text.innerText = 'Estado: Activo' : text.innerText = 'Estado: Desactivado';
+        status ? text.innerHTML = '<u>Estado:</u> Activo' : text.innerHTML = '<u>Estado:</u> Desactivado';
         let button = document.getElementById('status-disable-' + productId);
         if (button && button.innerText === 'Desact.🔒') {
             button.id = 'status-enable-' + productId;
@@ -142,13 +110,13 @@ socket.on('status', (productId, result, status, clientId) => {
             Swal.fire({
                 icon: 'error',
                 title: 'Error!',
-                text: `Hubo un error y no se pudo ${errorAction} el status del producto id#${productId}"`
+                text: `Hubo un error y no se pudo ${errorAction} el status del producto id#${productId}`
             });
         } else {
             errorToast.fire({
                 icon: 'error',
                 title: 'Error!',
-                text: `Hubo un error y no se pudo ${errorAction} el status del producto id#${productId}"`
+                text: `Hubo un error y no se pudo ${errorAction} el status del producto id#${productId}`
             });
         }
     }
@@ -170,7 +138,7 @@ socket.on('delete', (productId, result) => {
         // No se pudo realizar la baja del producto
         errorToast.fire({
             icon: 'error',
-            text: `Hubo un error y no se pudo borrar el producto id#${productId}"`
+            text: `Hubo un error y no se pudo borrar el producto id#${productId}`
         });
     }
 });
@@ -180,9 +148,9 @@ socket.on('newProduct', (newProduct, clientId) => {
     const successSwal = {
         icon: 'success',
         title: `Producto creado`,
-        text: `Se ha creado el producto id#${newProduct.id}"`
+        text: `Se ha creado el producto id#${newProduct.id}`
     };
-    // Se creó un nuevo producto
+    // Se recibe mensaje socket por creación de un nuevo producto
     let innerButtonHTML = '';
     let statusText = '';
     if (newProduct.status) {
@@ -200,6 +168,7 @@ socket.on('newProduct', (newProduct, clientId) => {
             <article class="articleProducto">
                 <header>
                     <h3 class="hProd" id="title-${newProduct.id}">${newProduct.title}📦</h3>
+                    <div class="productImages" id="images-${newProduct.id}"></div>
                 </header>
                 <p class="pProd" id="code-${newProduct.id}"><u> Código:</u> ${newProduct.code}</p>
                 <hr />
@@ -222,10 +191,23 @@ socket.on('newProduct', (newProduct, clientId) => {
     newTotal = parseInt(h2Total.innerText.split('Total: ')[1]) + 1;
     h2Total.innerText = 'Total: ' + newTotal;
     divProducts.appendChild(newProdDiv);
+    const imagesDiv = document.getElementById('images-' + newProduct.id);
+    if (Object.keys(newProduct.thumbnails).length > 0) {
+        for (let i = 0; i < Object.keys(newProduct.thumbnails).length; i++) {
+            const newThumb = document.createElement('img');
+            newThumb.src = newProduct.thumbnails[i];
+            newThumb.alt = 'Imagen del Producto ' + newProduct.title;
+            imagesDiv.appendChild(newThumb);
+        }
+    }else{
+        const noImagesMessage = document.createElement('p');
+        noImagesMessage.innerText= 'El producto aún no tiene imágenes';
+        imagesDiv.appendChild(noImagesMessage);
+    }
     let statusAction = '';
     newProduct.status ? statusAction = 'disable' : statusAction = 'enable';
     const statusButton = document.getElementById('status-' + statusAction + "-" + newProduct.id);
-    const deleteButton = document.getElementById('delete-' + newProduct.id);//event volver a poner, sino no cambia
+    const deleteButton = document.getElementById('delete-' + newProduct.id);
     statusButton.addEventListener('click', (event) => {
         let newStatus = false;
         productId = event.target.id.split('status-disable-')[1];
@@ -245,10 +227,14 @@ socket.on('newProduct', (newProduct, clientId) => {
     }
 });
 
+//Función de creación de Producto
 async function createProduct(url, productForm) {
     try {
         const response = await fetch(url, {
             method: 'POST',
+            headers: {
+                "Accept": "*/*"
+            },
             body: productForm
         });
         if (response.ok) {
@@ -274,5 +260,193 @@ async function createProduct(url, productForm) {
             text: `Ocurrió un error al intentar crear el producto: ${error.message}`
         });
         return false;
+    }
+}
+
+// Función de validación de formulario
+async function preConfirm() {
+    let result = false;
+    let bodyContent = new FormData();
+    let preConfirmPrice = true;
+    let preConfirmStock = true;
+    if (!document.getElementById("title").value ||
+        !document.getElementById("description").value ||
+        !document.getElementById("price").value ||
+        !document.getElementById("code").value ||
+        !document.getElementById("status").value ||
+        !document.getElementById("stock").value ||
+        !document.getElementById("category").value) {
+        Swal.showValidationMessage(`Debes ingresar todos los campos requeridos (*)`)
+        preConfirmPrice = false;
+        preConfirmStock = false;
+    }
+    const priceInput = document.getElementById("price");
+    const stockInput = document.getElementById("stock");
+    const smallPriceAlreadyThere = document.getElementById('invalid-helper-price');
+    const smallStockAlreadyThere = document.getElementById('invalid-helper-stock');
+    if (!parseInt(priceInput.value)) { //Se verifuca que el valor del precio no sea NaN
+        if (!smallPriceAlreadyThere) {
+            priceInput.setAttribute("aria-describedby", "invalid-helper-price");
+            const smallInvalidHelperPrice = document.createElement('small');
+            smallInvalidHelperPrice.id = 'invalid-helper-price';
+            smallInvalidHelperPrice.innerText = 'Se espera un precio numérico';
+            priceInput.insertAdjacentElement('afterend', smallInvalidHelperPrice);
+        } else {
+            smallPriceAlreadyThere.innerText = 'Se espera un precio numérico';
+        }
+        priceInput.ariaInvalid = 'true';
+        Swal.showValidationMessage(`Debes ingresar todos los campos requeridos (*)`);
+        preConfirmPrice = false
+    } else {
+        priceInput.ariaInvalid = 'false';
+        const smallInvalidHelperPrice = document.getElementById('invalid-helper-price');
+        if (smallInvalidHelperPrice) smallInvalidHelperPrice.innerText = 'El precio ingresado ahora es válido'
+        preConfirmPrice = true;
+    }
+    if (!parseInt(stockInput.value)) { //Se verifuca que el valor del stock no sea NaN
+        if (!smallStockAlreadyThere) {
+            stockInput.setAttribute('aria-describedby', 'invalid-helper-stock');
+            const smallInvalidHelperStock = document.createElement('small');
+            smallInvalidHelperStock.id = 'invalid-helper-stock';
+            smallInvalidHelperStock.innerText = 'Se espera una cantidad numérica de stock';
+            stockInput.insertAdjacentElement('afterend', smallInvalidHelperStock);
+        } else {
+            smallStockAlreadyThere.innerText = 'Se espera una cantidad numérica de stock';
+        }
+        stockInput.ariaInvalid = 'true';
+        Swal.showValidationMessage(`Debes ingresar todos los campos requeridos (*)`);
+        preConfirmStock = false
+    } else {
+        if (smallStockAlreadyThere) {
+            stockInput.ariaInvalid = 'false';
+            const smallInvalidHelperStock = document.getElementById('invalid-helper-stock');
+            if (smallInvalidHelperStock) smallInvalidHelperStock.innerText = 'La cantidad de stock ahora es válida'
+            preConfirmStock = true;
+        }
+    }
+    if (preConfirmPrice && preConfirmStock) {
+        result = {
+            "title": document.getElementById("title").value,
+            "description": document.getElementById("description").value,
+            "price": document.getElementById("price").value,
+            "code": document.getElementById("code").value,
+            "status": document.getElementById("status").value,
+            "stock": document.getElementById("stock").value,
+            "category": document.getElementById("category").value,
+        };
+    }
+    if (result) {
+        bodyContent.append("title", result.title);
+        bodyContent.append("description", result.description);
+        bodyContent.append("price", result.price);
+        bodyContent.append("code", result.code);
+        bodyContent.append("status", result.status);
+        bodyContent.append("stock", result.stock);
+        bodyContent.append("category", result.category);
+        const fileInput = document.getElementsByClassName("thumbnails");
+        if (fileInput) {
+            for (let i = 0; i < fileInput.length; i++) {
+                if (fileInput[i].files[0]) bodyContent.append("thumbnails", fileInput[i].files[0]);
+            }
+        }
+        const newProductId = await createProduct("http://localhost:8080/api/products", bodyContent);
+        if (newProductId) {
+            socket.emit('newProduct', newProductId);
+        }
+    };
+}
+
+//
+
+function addFileField() {
+    const maxPics = 5;
+    const allFileInput = document.getElementsByClassName('thumbnails');
+    const newFileInput = document.createElement('input');
+    let allowNewInput = true;
+    const productImagesH6 = document.getElementById('prodImagesH6');
+    if (productImagesH6) productImagesH6.remove();
+    if (allFileInput.length >= maxPics) {
+        if (!document.getElementById('errorH6')) {
+            const errorH6 = document.createElement('h6');
+            errorH6.id = 'errorH6';
+            errorH6.innerText = `⛔No se permiten más de ${maxPics} imágenes por producto`;
+            allFileInput[allFileInput.length - 1].insertAdjacentElement('afterend', errorH6);
+        }
+        //Swal.showValidationMessage(`No se permiten más de ${maxPics} imágenes por producto`);
+        allowNewInput = false;
+    } else {
+        for (let i = 0; i < allFileInput.length; i++) {
+            const smallFileAlreadyExists = document.getElementById('invalid-helper-file' + (i + 1));
+            if (!allFileInput[i].files[0]) {
+                allowNewInput = false;
+                if (!smallFileAlreadyExists) {
+                    allFileInput[i].ariaInvalid = 'true';
+                    allFileInput[i].setAttribute("aria-describedby", "invalid-helper-file" + (i + 1));
+                    const smallInvalidHelperFile = document.createElement('small');
+                    smallInvalidHelperFile.id = 'invalid-helper-file' + (i + 1);
+                    smallInvalidHelperFile.innerText = 'No hay archivo seleccionado';
+                    allFileInput[i].insertAdjacentElement('afterend', smallInvalidHelperFile);
+                } else {
+                    smallFileAlreadyExists.innerText = 'No hay archivo seleccionado';
+                }
+            } else {
+                allFileInput[i].ariaInvalid = 'false';
+                if (smallFileAlreadyExists) smallFileAlreadyExists.remove();
+            }
+        }
+    }
+
+    if (allowNewInput) {
+        newFileInput.classList = 'thumbnails';
+        newFileInput.type = 'file';
+        newFileInput.accept = 'image/*';
+        newFileInput.label
+        count = allFileInput.length + 1;
+        newFileInput.id = 'fileInput' + count;
+        newFileInput.addEventListener('change', (event) => {
+            if (event.target.files[0]) {
+                newFileInput.ariaInvalid = 'false';
+                const indexHelper = parseInt(event.target.id.split('fileInput')[1]) + 1;
+                const helperToDelete = document.getElementById('invalid-helper-file' + indexHelper);
+                if (helperToDelete) helperToDelete.remove();
+            } else {
+                event.target.ariaInvalid = 'true';
+            }
+        });
+        if (allFileInput.length > 0) allFileInput[allFileInput.length - 1].insertAdjacentElement('afterend', newFileInput);
+        else {
+            const prodImagesH5 = document.getElementById('prodImagesH5');
+            prodImagesH5.insertAdjacentElement('afterend', newFileInput);
+        }
+    }
+}
+
+function validateFileInput(event) {
+    if (event.target.files[0]) {
+        event.target.ariaInvalid = 'false';
+        const helperToDelete = document.getElementById('invalid-helper-file1');
+        if (helperToDelete) helperToDelete.remove();
+    } else {
+        event.target.ariaInvalid = 'true';
+    }
+}
+
+function removeFileField() {
+    const allFileInput = document.getElementsByClassName('thumbnails');
+    helperText = 'Ya no quedan fotos por quitar';
+    if (allFileInput.length > 0) {
+        const invalidHelper = document.getElementById('invalid-helper-file' + allFileInput.length);
+        if (invalidHelper) invalidHelper.remove();
+        allFileInput[allFileInput.length - 1].remove();
+    } else {
+        const productImagesH6Exists = document.getElementById('prodImagesH6');
+        if (!productImagesH6Exists) {
+            const productImagesH6 = document.createElement('h6');
+            productImagesH6.id = 'prodImagesH6';
+            productImagesH6.innerText = helperText;
+            productImagesH6.style.color = '#ce7e7b';
+            const prodImagesH5 = document.getElementById('prodImagesH5');
+            prodImagesH5.insertAdjacentElement('afterend', productImagesH6);;
+        }
     }
 }

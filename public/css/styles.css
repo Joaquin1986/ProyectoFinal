@@ -17,7 +17,7 @@
 #addButton {
     border-radius: 80px;
     font-size: larger;
-    transition: 0.4s;
+    transition: 0.2s;
 }
 
 #addButton:hover,
@@ -30,6 +30,28 @@
 
 .product {
     padding: 15px;
+}
+
+.productImages{
+    text-align: center;
+}
+
+.productImages img {
+    border-radius: 80px;
+    width: 90px;
+    height: 90px;
+    transition: 0.4s;
+    margin-left: -20px;
+    margin-right: -20px;
+    border: 1px;
+    border-color: #2d3547;
+    border-style: dashed;
+}
+
+.productImages img:hover {
+    filter: brightness(120%);
+    width: 100px;
+    height: 100px;
 }
 
 .articleProducto {
@@ -49,11 +71,17 @@
     margin-right: 20px;
 }
 
-.swal2-title,
-.swal2-html-container,
 .swal2-popup,
 .swal2-validation-message,
 input {
-    color: #c2c7d0;
+    color: #d0c2c2;
+    background-color: #13171f;
+}
+
+#filesDiv {
+    border: 1px;
+    border-style: solid;
+    border-radius: 5px;
+    border-color: #2a3140;
     background-color: #13171f;
 }
