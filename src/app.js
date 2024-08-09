@@ -6,8 +6,9 @@ const productsApiRouter = require('./routes/api/products.api.router.js');
 const cartsApiRouter = require('./routes/api/carts.api.router.js');
 const realTimeProductsViewRouter = require('./routes/views/realTimeProducts.views.router.js');
 const homeViewRouter = require('./routes/views/home.views.router.js');
+const notFound404 = require('./routes/views/notFound404.views.router.js');
 const { publicPath, viewsPath } = require("./utils/utils.js");
-const initServer = require('./server.js');
+const initServer = require('./server/server.js');
 
 // Se crea el server Express con el puerto correspondiente
 const app = express();
@@ -26,6 +27,7 @@ initServer(app).then(() => {
 
     app.use("/views", homeViewRouter);
     app.use("/views", realTimeProductsViewRouter);
+    app.use("/views", notFound404);
 
     app.use(("*", (req, res, next) => {
         const errorPath = path.join(__dirname, req.originalUrl);

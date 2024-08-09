@@ -1,5 +1,9 @@
 const { Server } = require('socket.io');
-const { ProductManager } = require('./controllers/ProductManager');
+const { ProductManager } = require('../controllers/ProductManager');
+
+/* Tanto la baja como el cambio de status de los productos se realizan mediante SocketIO. Sin embargo, 
+   la creación de nuevos productos se realiza mediante fetch (método POST) hacia el Endpoint/API
+   de Productos a efectos de optimizar el rendimiento en la subida de imágenes (thumbnails) */
 
 const initSocket = async (httpServer) => {
     const socketServer = new Server(httpServer);

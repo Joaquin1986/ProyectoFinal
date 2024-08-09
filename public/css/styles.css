@@ -1,3 +1,13 @@
+#logoNav {
+    max-width: 250px;
+    transition: 0.4s;
+    filter: brightness(85%);
+}
+
+#logoNav:hover {
+    filter: brightness(120%);
+}
+
 .hProd {
     text-align: center;
 }
@@ -32,7 +42,7 @@
     padding: 15px;
 }
 
-.productImages{
+.productImages {
     text-align: center;
 }
 
@@ -46,12 +56,14 @@
     border: 1px;
     border-color: #2d3547;
     border-style: dashed;
+    filter: grayscale(60%);
 }
 
 .productImages img:hover {
     filter: brightness(120%);
     width: 100px;
     height: 100px;
+    filter: grayscale(0%);
 }
 
 .articleProducto {
@@ -84,4 +96,17 @@ input {
     border-radius: 5px;
     border-color: #2a3140;
     background-color: #13171f;
+}
+
+
+#text404Div {
+    position: fixed;
+    right: 27%;
+    bottom: 40%;
+}
+
+@media only screen and (max-width: 768px) {
+    #logoNav {
+        max-width: 125px;
+    }
 }

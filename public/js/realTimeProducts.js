@@ -50,7 +50,8 @@ addProductButton.addEventListener('click', async (e) => {
         `,
         showConfirmButton: false,
         focusConfirm: false,
-        showCloseButton: false
+        showCloseButton: false,
+        allowOutsideClick: false
     });
 });
 
@@ -75,7 +76,7 @@ for (let i = 0; i < Object.keys(deleteButtons).length; i++) {
         socket.emit('delete', productId);
     });
 }
-''
+
 socket.on('status', (productId, result, status, clientId) => {
     if (result) {
         let action = '';
@@ -199,9 +200,9 @@ socket.on('newProduct', (newProduct, clientId) => {
             newThumb.alt = 'Imagen del Producto ' + newProduct.title;
             imagesDiv.appendChild(newThumb);
         }
-    }else{
+    } else {
         const noImagesMessage = document.createElement('p');
-        noImagesMessage.innerText= 'El producto aún no tiene imágenes';
+        noImagesMessage.innerText = 'El producto aún no tiene imágenes';
         imagesDiv.appendChild(noImagesMessage);
     }
     let statusAction = '';

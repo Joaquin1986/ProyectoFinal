@@ -9,11 +9,10 @@
         </ul>
     </nav>
     <hr />
-    <h1 class="hProd">Productos en TIEMPO REAL ⌚ </h1>
+    <h1 class="hProd">Home de Productos 🛒</h1>
     {{#if products}}
     <h2 class="hProd" id="h2Total">Total: {{products.length}}</h2>
     <div id="productsGrid">
-        <div class="addButtonDiv"><button id="addButton" title="Crear nuevo Producto">➕</button></div>
         {{#each products}}
         <div class="product" id="product-{{id}}">
             <article class="articleProducto">
@@ -40,14 +39,6 @@
                 <p class="pProd" id="status-{{id}}"><u>Categoría:</u> {{category}}</p>
                 <hr />
                 <p class="pProd" id="status-{{id}}"><u>Precio:</u> ${{price}}</p>
-                <footer class="footerProduct">
-                    {{#if status}}
-                    <button class="statusProductButton" id="status-disable-{{id}}">Desact.🔒</button>
-                    {{else}}
-                    <button class="statusProductButton" id="status-enable-{{id}}">Activar🔓</button>
-                    {{/if}}
-                    <button class="deleteProductButton" id="delete-{{id}}">Borrar🗑</button>
-                </footer>
             </article>
         </div>
         {{/each}}
@@ -57,7 +48,3 @@
 
     {{/if}}
 </div>
-
-<script src="/socket.io/socket.io.js"> </script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="../js/realTimeProducts.js"> </script>

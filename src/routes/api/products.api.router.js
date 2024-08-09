@@ -2,7 +2,6 @@
 const { Router } = require('express');
 const { Product, ProductManager } = require('../../controllers/ProductManager');
 const { uploadMulter } = require('../../utils/utils');
-const path = require('path');
 
 const productsRouter = Router();
 const maxFilesAllowed = 5;
@@ -33,8 +32,7 @@ productsRouter.post("/products", uploadMulter.array('thumbnails'), async (req, r
     const { body } = req;
     const { title, description, price, code, status, stock, category } = body;
     let newStatus = true;
-    if (!title || !description || !parseInt(price) || !code || !parseInt(stock) || !category ||
-        req.files.length > maxFilesAllowed) {
+    if (!title || !description || !parseInt(price) || !code || !parseInt(stock) || !category) {
         return res.status(400).json({
             "⛔Error:":
                 "Petición incorrecta (los valores proporcionados no son los esperados)"
@@ -91,24 +89,26 @@ productsRouter.put("/products/:pid", uploadMulter.array('thumbnails'), async (re
             if (status && status.toLowerCase() === "true") statusNew = true;
             existsId = await ProductManager.productIdExists(pid);
             if (existsId) {
-                if (req.files.length > maxFilesAllowed) return res.status(400).json({
-                    "⛔Error:":
-                        `Se superó el límite de imágenes: ${maxFilesAllowed}`
-                });
                 const prodFound = ProductManager.getProductById(pid); //luego será con AWAIT
+                let thumbnailsTotalQuantity = Object.values(prodFound.thumbnails).length + req.files.length;
+                if (req.files.length > maxFilesAllowed || thumbnailsTotalQuantity > maxFilesAllowed) return res.status(400).json({
+                    "⛔Error:":
+                        `Se superó el límite de imágenes permitido: ${maxFilesAllowed}`
+                });
                 if (prodFound.code !== code) return res.status(400).json({
                     "⛔Error:":
                         "No coincide id con codigo del producto recibido"
                 });
                 const existsCode = await ProductManager.productCodeExists(code);
                 if (existsCode) {
-                    if (!title || !description || !price || !code || !stock || !category) {
+                    if (!title || !description || !parseInt(price) || !code || !parseInt(stock) ||
+                        !category || req.files.length > maxFilesAllowed) {
                         return res.status(400).json({
                             "⛔Error:":
-                                "Producto recibido no es válido. Propiedades vacías o sin definir"
+                                `Petición recibida no es válida, revisar que no falte data o que no se supere el límite de thumbnails(${maxFilesAllowed})`
                         });
                     } else {
-                        const newProduct = new Product(title, description, price, code, stock, category);
+                        const newProduct = new Product(title, description, parseInt(price), code, statusNew, parseInt(stock), category);
                         //Se mantiene el mismo 'id' del Producto, ya que el contructor por defecto asigna uno único
                         newProduct.id = pid;
                         const thumbnailsObjValues = Object.values(prodFound.thumbnails);
@@ -127,12 +127,12 @@ productsRouter.put("/products/:pid", uploadMulter.array('thumbnails'), async (re
                             newProduct.description = description;
                             changesDone.push(`Se modifica la descripcion a ${description}`);
                         }
-                        if (prodFound.price !== price) {
-                            newProduct.price = price;
+                        if (prodFound.price !== parseInt(price)) {
+                            newProduct.price = parseInt(price);
                             changesDone.push(`Se modifica el precio a $${price}`);
                         }
-                        if (prodFound.stock !== stock) {
-                            newProduct.stock = stock;
+                        if (prodFound.stock !== parseInt(stock)) {
+                            newProduct.stock = parseInt(stock);
                             changesDone.push(`Se modifica el stock a ${stock}`);
                         }
                         if (prodFound.category !== category) {
@@ -194,7 +194,7 @@ productsRouter.put("/products/:pid", uploadMulter.array('thumbnails'), async (re
                     }
                 }
             }
-            return res.status(404).json({ "⛔Error:": "Producto recibido no existe en la base" });
+            return res.status(404).json({ "⛔Error:": "Producto no encontrado" });
         } catch (error) {
             return res.status(500).json({ "⛔Error interno:": `${error}, ${error.message}` });
         }
