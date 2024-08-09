@@ -5,7 +5,7 @@ const path = require('path');
 const productsApiRouter = require('./routes/api/products.api.router.js');
 const cartsApiRouter = require('./routes/api/carts.api.router.js');
 const realTimeProductsViewRouter = require('./routes/views/realTimeProducts.views.router.js');
-const homeViewRouter = require('./routes/views/home.views.router.js');
+const indexViewRouter = require('./routes/views/index.views.router.js');
 const notFound404 = require('./routes/views/notFound404.views.router.js');
 const { publicPath, viewsPath } = require("./utils/utils.js");
 const initServer = require('./server/server.js');
@@ -25,7 +25,7 @@ initServer(app).then(() => {
     app.use("/api", productsApiRouter);
     app.use("/api", cartsApiRouter);
 
-    app.use("/views", homeViewRouter);
+    app.use("/views", indexViewRouter);
     app.use("/views", realTimeProductsViewRouter);
     app.use("/views", notFound404);
 
