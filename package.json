@@ -1,6 +1,6 @@
 {
-  "name": "primera-pre-entrega",
-  "version": "1.0.0",
+  "name": "almacen-productos",
+  "version": "2.0.0",
   "description": "",
   "main": "src/app.js",
   "scripts": {
