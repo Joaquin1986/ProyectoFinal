@@ -1,63 +1,66 @@
 <div class="container">
     <nav>
         <ul>
-            <li><a href="./"><img id="logoNav" src="../../img/logoAlmacen.png" alt="Almacen de Productos"></a></li>
+            <li><a href="/views/products"><img id="logoNav" src="/img/logoAlmacen.png" alt="Almacen de Productos"></a>
+            </li>
         </ul>
         <ul>
-            <li><a href="./" class="contrast">Home 🏡</a></li>
-            <li><a href="./realtimeproducts" class="contrast">Productos en Tiempo Real⌚</a></li>
+            <li><a href="/views/products" class="contrast">Home 🏡</a></li>
+            <li><a href="/views/realtimeproducts" class="contrast">Productos en Tiempo Real⌚</a></li>
         </ul>
     </nav>
     <hr />
     <h1 class="hProd">Productos en TIEMPO REAL ⌚ </h1>
     {{#if products}}
-    <h2 class="hProd" id="h2Total">Total: {{products.length}}</h2>
     <div id="productsGrid">
         <div class="addButtonDiv"><button id="addButton" title="Crear nuevo Producto">➕</button></div>
         {{#each products}}
-        <div class="product" id="product-{{id}}">
-            <article class="articleProducto">
+        <div class="product" id="product-{{_id}}">
+            <article class="articleProduct">
                 <header>
-                    <h3 class="hProd" id="title-{{id}}">{{title}}📦</h3>
-                    <div class="productImages" id="images-{{id}}">
+                    <h3 class="hProd" id="title-{{_id}}">{{title}}📦</h3>
+                    <div class="productImages" id="images-{{_id}}">
                         {{#if thumbnails}}
                         {{#each thumbnails}}
-                        <img src="{{this}}" alt="Imagen del Producto {{title}}">
+                        <img src="{{this}}" alt="Imagen del Producto {{../title}}">
                         {{/each}}
                         {{else}}
                         <p>El producto aún no tiene imágenes</p>
                         {{/if}}
                     </div>
                 </header>
-                <p class="pProd" id="code-{{id}}"><u> Código:</u> {{code}}</p>
+                <p class="pProd" id="code-{{_id}}"><u> Código:</u> {{code}}</p>
                 <hr />
-                <p class="pProd" id="description-{{id}}"><u>Descripción:</u> {{description}}</p>
+                <p class="pProd" id="description-{{_id}}"><u>Descripción:</u> {{description}}</p>
                 <hr />
-                <p class="pProd" id="status-{{id}}"><u>Estado:</u> {{#if status}}Activo{{else}}Desactivado{{/if}}</p>
+                <p class="pProd" id="status-{{_id}}"><u>Estado:</u> {{#if status}}Activo{{else}}Desactivado{{/if}}</p>
                 <hr />
-                <p class="pProd" id="status-{{id}}"><u>Stock:</u> {{stock}}</p>
+                <p class="pProd" id="stock-{{_id}}"><u>Stock:</u> {{stock}}</p>
                 <hr />
-                <p class="pProd" id="status-{{id}}"><u>Categoría:</u> {{category}}</p>
+                <p class="pProd" id="category-{{_id}}"><u>Categoría:</u> {{category}}</p>
                 <hr />
-                <p class="pProd" id="status-{{id}}"><u>Precio:</u> ${{price}}</p>
+                <p class="pProd" id="price-{{_id}}"><u>Precio:</u> ${{price}}</p>
                 <footer class="footerProduct">
                     {{#if status}}
-                    <button class="statusProductButton" id="status-disable-{{id}}">Desact.🔒</button>
+                    <button class="statusProductButton" id="status-disable-{{_id}}">Desact.🔒</button>
                     {{else}}
-                    <button class="statusProductButton" id="status-enable-{{id}}">Activar🔓</button>
+                    <button class="statusProductButton" id="status-enable-{{_id}}">Activar🔓</button>
                     {{/if}}
-                    <button class="deleteProductButton" id="delete-{{id}}">Borrar🗑</button>
+                    <button class="deleteProductButton" id="delete-{{_id}}">Borrar🗑</button>
                 </footer>
             </article>
         </div>
         {{/each}}
     </div>
+    <h2 class="hProd" id="h2Total">Total: {{products.length}}</h2>
     {{else}}
-    <h2>No hay productos para mostrar ⛔</h2>
-
+    <div id="productsGrid">
+        <div class="addButtonDiv"><button id="addButton" title="Crear nuevo Producto">➕</button></div>
+        <h2 id="noProductsH2">No hay productos para mostrar ⛔</h2>
+    </div>
     {{/if}}
 </div>
 
 <script src="/socket.io/socket.io.js"> </script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="../js/realTimeProducts.js"> </script>
+<script src="/js/realTimeProducts.js"> </script>

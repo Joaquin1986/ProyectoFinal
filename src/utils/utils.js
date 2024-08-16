@@ -19,6 +19,7 @@ const storage = multer.diskStorage({
         cb(null, uniquePreffix + '-' + file.originalname);
     }
 });
+
 const uploadMulter = multer({ storage: storage });
 
 function readJsonDataFromFile(file) {
@@ -35,4 +36,12 @@ Descripción del error: ${error.message}`);
     }
 }
 
-module.exports = { uploadMulter, publicPath, viewsPath, productsPath, cartsPath, thumbnailsPath, readJsonDataFromFile };
+module.exports = {
+    uploadMulter,
+    publicPath,
+    viewsPath,
+    productsPath,
+    cartsPath,
+    thumbnailsPath,
+    readJsonDataFromFile
+};

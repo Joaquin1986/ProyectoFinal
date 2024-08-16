@@ -1,7 +1,7 @@
 // Se realizan los imports mediante 'require', de acuerdo a lo visto en clase
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
-const { ProductManager } = require('./ProductManager.js');
+const { ProductManager } = require('./ProductManagerFS.js');
 const { readJsonDataFromFile, productsPath: path } = require('../utils/utils.js')
 
 /* Si bien cuando implementemos BD la funcion de lectura sera asincronica, como en esta primer

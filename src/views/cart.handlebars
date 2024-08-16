@@ -1,0 +1,77 @@
+<div class="container">
+    <nav>
+        <ul>
+            <li><a href="/views/products"><img id="logoNav" src="/img/logoAlmacen.png" alt="Almacen de Productos"></a>
+            </li>
+        </ul>
+        <ul>
+            <li><a href="/views/products" class="contrast">Home 🏡</a></li>
+            <li id="liBeforeCart"><a href="/views/realtimeproducts" class="contrast">Productos en Tiempo Real⌚</a></li>
+        </ul>
+    </nav>
+    <hr />
+    <div id="cartDetailsDiv">
+        {{#if cart}}
+        {{#if cart.products}}
+        <article>
+            <header>
+                <h3 class="cartDetails" id="{{cart._id}}">Detalle del Carrito 🛒</h3>
+            </header>
+            <table id="cartDetailsTable">
+                <thead>
+                    <tr>
+                        <th scope="col">Producto</th>
+                        <th scope="col">Cantidad</th>
+                        <th scope="col">Precio</th>
+                        <th scope="col">Quitar</th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyProducts">
+                    {{#each cart.products}}
+                    <tr>
+                        <th scope="row">{{this.product.title}}</th>
+                        <td>{{this.quantity}}</td>
+                        <td>${{this.product.price}}</td>
+                        <td><button class="outline secondary" id="remove-{{this.product._id}}"
+                                onclick="removeProductFromCart(event)">🗑</button></td>
+                    </tr>
+                    {{/each}}
+                <tfoot>
+                    <tr>
+                        <th scope="row"><b>Subtotal</b></th>
+                        <td><b>{{productsTotal}}</b></td>
+                        <td><b>${{totalPrice}}</b></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><b>Total(IVA 23%)</b></th>
+                        <td><b>{{productsTotal}}</b></td>
+                        <td><b>${{totalPriceWithTaxes}}</b></td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+            <footer>
+                <div role="button" class="primary" tabindex="0" id="cartCheckoutButton">Enviar Orden📦</div>
+                <div role="button" class="secondary" onclick="deleteCart('/api/carts/{{cart._id}}')" tabindex="0"
+                    id="cartDeleteButton">Borrar Carrito 🗑</div>
+                <div role="button" class="secondary" onclick="backToProducts(event)" tabindex="0" id="cartBackButton">
+                    Volver
+                    a Productos 🏡</div>
+            </footer>
+        </article>
+        {{else}}
+        <div id="cartNoValidDiv">
+            <h2 id="noProductsH2">Carrito vacío esperando que <a href="/views/products">elijas productos 📦</a></h2>
+        </div>
+        {{/if}}
+        {{else}}
+        <div id="cartNoValidDiv">
+            <h2 id="noProductsH2">Carrito no válido ⛔</h2>
+        </div>
+        {{/if}}
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="/js/cart.js"> </script>

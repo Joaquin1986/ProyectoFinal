@@ -1,15 +1,14 @@
-// Se realizan los imports mediante 'require', de acuerdo a lo visto en clase
 const { Router } = require('express');
-const { Product, ProductManager } = require('../../controllers/ProductManager');
+const { Product, ProductManager } = require('../../controllers/ProductManagerDB');
 const { uploadMulter } = require('../../utils/utils');
 
-const productsRouter = Router();
+const productsApiRouter = Router();
 const maxFilesAllowed = 5;
 
-productsRouter.get("/products", async (req, res) => {
+productsApiRouter.get("/products", async (req, res) => {
     const { limit } = req.query;
     if (!limit || parseInt(limit) === 0) {
-        const products = await ProductManager.getProducts();
+        const products = await ProductManager.getProducts().lean();
         if (products.length === 0) return res.status(200).json({ "Productos": "Sin productos creados" });
         return res.status(200).json({ "Productos": products });
     }
@@ -20,15 +19,15 @@ productsRouter.get("/products", async (req, res) => {
     return res.status(200).json(filteredProducts);
 });
 
-productsRouter.get("/products/:pid", (req, res) => { //luego sera async
+productsApiRouter.get("/products/:pid", async (req, res) => {
     const { pid } = req.params;
-    const product = ProductManager.getProductById(pid) //luego tendra await
+    const product = await ProductManager.getProductById(pid);
     if (product) return res.status(200).json(product);
     return res.status(404).json({ "⛔Error": `Producto id #${pid} no encontrado` });
 });
 
 // Al siguiente endpoint (POST) se le puede pasar un array llamado 'thumbnails" por Multer
-productsRouter.post("/products", uploadMulter.array('thumbnails'), async (req, res) => {
+productsApiRouter.post("/products", uploadMulter.array('thumbnails'), async (req, res) => {
     const { body } = req;
     const { title, description, price, code, status, stock, category } = body;
     let newStatus = true;
@@ -52,8 +51,8 @@ productsRouter.post("/products", uploadMulter.array('thumbnails'), async (req, r
             }
             const result = await ProductManager.addProduct(prod1);
             if (result) {
-                console.log("✅Producto Creado --> id#" + prod1.id);
-                return res.status(201).json({ "productId": prod1.id });
+                console.log("✅Producto Creado --> id#" + result._id);
+                return res.status(201).json({ "productId": result._id });
             }
             const prodFound = await ProductManager.getProductByCode(prod1.code);
             return res.status(400).json({
@@ -71,7 +70,7 @@ productsRouter.post("/products", uploadMulter.array('thumbnails'), async (req, r
    Se pueden enviar también los valores  'deleteThumbIndex' como un array.
    Unicos status permitidos: true o false. Valor por defecto siempre es true, a menos que se especifique false.*/
 
-productsRouter.put("/products/:pid", uploadMulter.array('thumbnails'), async (req, res) => {
+   productsApiRouter.put("/products/:pid", uploadMulter.array('thumbnails'), async (req, res) => {
     const changesDone = [];
     const { pid } = req.params
     const { body } = req;
@@ -89,7 +88,7 @@ productsRouter.put("/products/:pid", uploadMulter.array('thumbnails'), async (re
             if (status && status.toLowerCase() === "true") statusNew = true;
             existsId = await ProductManager.productIdExists(pid);
             if (existsId) {
-                const prodFound = ProductManager.getProductById(pid); //luego será con AWAIT
+                const prodFound = await ProductManager.getProductById(pid);
                 let thumbnailsTotalQuantity = Object.values(prodFound.thumbnails).length + req.files.length;
                 if (req.files.length > maxFilesAllowed || thumbnailsTotalQuantity > maxFilesAllowed) return res.status(400).json({
                     "⛔Error:":
@@ -203,7 +202,7 @@ productsRouter.put("/products/:pid", uploadMulter.array('thumbnails'), async (re
     }
 });
 
-productsRouter.delete("/products/:pid", async (req, res) => {
+productsApiRouter.delete("/products/:pid", async (req, res) => {
     const { pid } = req.params;
     if (pid) {
         try {
@@ -218,4 +217,4 @@ productsRouter.delete("/products/:pid", async (req, res) => {
     }
 });
 
-module.exports = productsRouter;
+module.exports = productsApiRouter;

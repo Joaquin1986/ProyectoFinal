@@ -1,0 +1,67 @@
+<div class="container">
+    <nav>
+        <ul>
+            <li><a href="/views/products"><img id="logoNav" src="/img/logoAlmacen.png" alt="Almacen de Productos"></a>
+            </li>
+        </ul>
+        <ul>
+            <li><a href="/views/products" class="contrast">Home 🏡</a></li>
+            <li id="liBeforeCart"><a href="/views/realtimeproducts" class="contrast">Productos en Tiempo Real⌚</a></li>
+        </ul>
+    </nav>
+    <hr />
+    {{#if product}}
+    <h1 class="hProd" id="{{product.title}}">Detalle de "{{product.title}}"</h1>
+    <div id="productContainer">
+        <div class="productDetail" id="productDetail-{{product._id}}">
+            <article class="articleProductDetail">
+                <header>
+                    <div class="productDetailImages" id="images-{{product._id}}">
+                        {{#if product.thumbnails}}
+                        <section id="image-carousel" class="splide" aria-label="Imagenes de {{product.title}}">
+                            <div class="splide__track">
+                                <ul class="splide__list">
+                                    {{#each product.thumbnails}}
+                                    <li class="splide__slide">
+                                        <img src="{{this}}" alt="Imagen del Producto {{../product.title}}">
+                                    </li>
+                                    {{/each}}
+                                </ul>
+                            </div>
+                        </section>
+                        {{else}}
+                        <p>El producto aún no tiene imágenes</p>
+                        {{/if}}
+                    </div>
+                </header>
+                <p class="pProd" id="code-{{product._id}}"><u> Código:</u> {{product.code}}</p>
+                <hr />
+                <p class="pProd" id="description-{{product._id}}"><u>Descripción:</u> {{product.description}}</p>
+                <hr />
+                <p class="pProd" id="stock-{{product._id}}"><u>Stock:</u> {{product.stock}}</p>
+                <hr />
+                <p class="pProd" id="category-{{product._id}}"><u>Categoría:</u> {{product.category}}</p>
+                <hr />
+                <p class="pProd" id="price-{{product._id}}"><u>Precio:</u> ${{product.price}}</p>
+                <footer class="footerProduct">
+                    <div class="productDetailControlsDiv">
+                        <button class="secondary" id="removeProductDetailDisplay">➖</button>
+                        <p id="productDetailDisplay">1</p><button class="secondary"
+                            id="addProductDetailDisplay">➕</button>
+                    </div>
+                    <div role="button" id="addToCartButton" onclick="addToCart(event)">Agregar 🛒</div>
+                    <div role="button" class="secondary" id="backToProductsButton" onclick="backToProducts(event)">Volver 🏡
+                    </div>
+                </footer>
+            </article>
+        </div>
+    </div>
+    {{else}}
+    <h2 id="noProductsH2">No hay producto para mostrar ⛔</h2>
+
+    {{/if}}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="/js/productDetailed.js"> </script>

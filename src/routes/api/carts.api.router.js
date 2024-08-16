@@ -1,16 +1,15 @@
 // Se realizan los imports mediante 'require', de acuerdo a lo visto en clase
 const { Router } = require('express');
-const { CartManager } = require('../../controllers/CartManager');
-const { ProductManager } = require('../../controllers/ProductManager');
+const { Cart, CartManager } = require('../../controllers/CartManagerBD');
 
-const cartsRouter = Router();
+const cartsApiRouter = Router();
 
-cartsRouter.get("/carts/:cid", (req, res) => {
+cartsApiRouter.get("/carts/:cid", async (req, res) => {
     const { cid } = req.params;
     if (cid) {
         try {
-            const cart =  CartManager.getCartById(cid);
-            if (cart) return res.status(200).json({ "Productos": cart.products });
+            const cart = await CartManager.getCartById(cid);
+            if (cart) return res.status(200).json({ "products": cart.products });
             return res.status(404).json({ "⛔Error": `Carrito id '${cid}' no encontrado` });
         } catch (error) {
             res.status(500).json({ "⛔Error interno:": error.message });
@@ -21,10 +20,11 @@ cartsRouter.get("/carts/:cid", (req, res) => {
     }
 });
 
-cartsRouter.post("/carts", async (req, res) => {
+cartsApiRouter.post("/carts", async (req, res) => {
     try {
-        const result = await CartManager.addCart();
-        result ? res.status(201).json({ "✅Carrito creado": result }) : res.status(500).json({
+        const newCart = new Cart();
+        const result = await CartManager.addCart(newCart);
+        result ? res.status(201).json({ "cartId": result }) : res.status(500).json({
             "⛔Error:":
                 "Hubo un error interno del servidor al crear el carrito"
         });
@@ -34,22 +34,44 @@ cartsRouter.post("/carts", async (req, res) => {
 });
 
 // De acuerdo a la consigna, por ahora, solo suma de a 1 la cantidad
-cartsRouter.post("/carts/:cid/product/:pid", async (req, res) => {
+cartsApiRouter.put("/carts/:cid/product/:pid", async (req, res) => {
     const { cid, pid } = req.params;
-    const quantity = 1;
-    if (cid && pid) {
-        try {
-            const result = await CartManager.addProductToCart(cid, pid, quantity);
-            const prodAdded = ProductManager.getProductById(pid);
-            if (result) return res.status(200).json({ "✅Cantidad agregada": `+${quantity} de '${prodAdded.title}' al carrito #${cid}` });
-            if (result === undefined) return res.status(500).json({ "⛔Error": "Error: debe crear primero algún carrito (POST '/api/carts/')" });
-            return res.status(404).json({ "⛔Error": `Carrito id '${cid} o producto ${pid} no encontrado` });
-        } catch (error) {
-            return res.status(500).json({ "⛔Error:": error.message });
-        }
-    } else {
-        res.status(400).json({ "⛔Error:": "Request invalido" });
+    const quantity = 1;  // A VER QUE DICE LA LETRA; SINO SERIA => const { quantity } = req.body;
+    try {
+        const result = await CartManager.addProductToCart(cid, pid, quantity);
+        if (result) return res.status(200).json({ 'productAdded': pid, 'inCart': cid, 'quantity': quantity });
+        return res.status(400).json({ '⛔Error': 'Request no válido' });
+    } catch (error) {
+        return res.status(500).json({ "⛔Error interno:": error.message });
     }
 });
 
-module.exports = cartsRouter;
+cartsApiRouter.delete("/carts/:cid", async (req, res) => {
+    const { cid } = req.params;
+    try {
+        const result = await CartManager.deleteCart(cid);
+        result.deletedCount > 0 ? res.status(201).json({ "deletedCart": cid }) : res.status(400).json({
+            "⛔Error:": "Request no válido"
+        });
+    } catch (error) {
+        res.status(500).json({ "⛔Error interno:": error.message });
+    }
+});
+
+// Elimina un producto de un carrito
+cartsApiRouter.delete("/carts/:cid/product/:pid", async (req, res) => {
+    const { cid, pid } = req.params;
+    try {
+        const isProductInCart = await CartManager.isProductInCart(cid, pid);
+        if (isProductInCart) {
+            const result = await CartManager.deleteProductFromCart(cid, pid);
+            const newCart = await CartManager.getPopulatedCartById(cid);
+            if (result) return res.status(200).json({ 'productRemoved': pid, 'fromCart': cid, "remainingProducts": newCart.products });
+        }
+        return res.status(400).json({ '⛔Error': 'Request no válido' });
+    } catch (error) {
+        return res.status(500).json({ "⛔Error interno:": error.message });
+    }
+});
+
+module.exports = cartsApiRouter;

@@ -1,5 +1,5 @@
 const { Server } = require('socket.io');
-const { ProductManager } = require('../controllers/ProductManager');
+const { ProductManager } = require('../controllers/ProductManagerDB');
 
 /* Tanto la baja como el cambio de status de los productos se realizan mediante SocketIO. Sin embargo, 
    la creación de nuevos productos se realiza mediante fetch (método POST) hacia el Endpoint/API
@@ -17,8 +17,8 @@ const initSocket = async (httpServer) => {
             const result = await ProductManager.deleteProduct(product)
             socketServer.emit('delete', product, result);
         });
-        socketClient.on('newProduct', (productId) => { //luego sera async
-            const newProduct = ProductManager.getProductById(productId)  //luego sera con await
+        socketClient.on('newProduct', async (productId) => {
+            const newProduct = await ProductManager.getProductById(productId);
             socketServer.emit('newProduct', newProduct, socketClient.id);
         });
     });

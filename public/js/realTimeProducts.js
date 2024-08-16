@@ -149,50 +149,63 @@ socket.on('newProduct', (newProduct, clientId) => {
     const successSwal = {
         icon: 'success',
         title: `Producto creado`,
-        text: `Se ha creado el producto id#${newProduct.id}`
+        text: `Se ha creado el producto id#${newProduct._id}`
     };
     // Se recibe mensaje socket por creación de un nuevo producto
+    const noProductH2 = document.getElementById('noProductsH2');
+    if (noProductH2) {
+        noProductH2.remove();
+    }
     let innerButtonHTML = '';
     let statusText = '';
     if (newProduct.status) {
-        innerButtonHTML = '<button class="statusProductButton" id="status-disable-' + newProduct.id + '">Desact.🔒</button>';
+        innerButtonHTML = '<button class="statusProductButton" id="status-disable-' + newProduct._id + '">Desact.🔒</button>';
         statusText = 'Activo';
     } else {
-        innerButtonHTML = '<button class="statusProductButton" id="status-enable-' + newProduct.id + '">Activar🔓</button>';
+        innerButtonHTML = '<button class="statusProductButton" id="status-enable-' + newProduct._id + '">Activar🔓</button>';
         statusText = 'Desactivado';
     }
     const divProducts = document.getElementById('productsGrid');
     let newProdDiv = document.createElement('div');
     newProdDiv.classList = 'product';
-    newProdDiv.id = `product-${newProduct.id}`;
+    newProdDiv.id = `product-${newProduct._id}`;
     newProdDiv.innerHTML = `
-            <article class="articleProducto">
+            <article class="articleProduct">
                 <header>
-                    <h3 class="hProd" id="title-${newProduct.id}">${newProduct.title}📦</h3>
-                    <div class="productImages" id="images-${newProduct.id}"></div>
+                    <h3 class="hProd" id="title-${newProduct._id}">${newProduct.title}📦</h3>
+                    <div class="productImages" id="images-${newProduct._id}"></div>
                 </header>
-                <p class="pProd" id="code-${newProduct.id}"><u> Código:</u> ${newProduct.code}</p>
+                <p class="pProd" id="code-${newProduct._id}"><u> Código:</u> ${newProduct.code}</p>
                 <hr />
-                <p class="pProd" id="description-${newProduct.id}"><u>Descripción:</u> ${newProduct.description}</p>
+                <p class="pProd" id="description-${newProduct._id}"><u>Descripción:</u> ${newProduct.description}</p>
                 <hr />
-                <p class="pProd" id="status-${newProduct.id}"><u>Estado:</u> ${statusText}</p>
+                <p class="pProd" id="status-${newProduct._id}"><u>Estado:</u> ${statusText}</p>
                 <hr />
-                <p class="pProd" id="status-${newProduct.id}"><u>Stock:</u> ${newProduct.stock}</p>
+                <p class="pProd" id="status-${newProduct._id}"><u>Stock:</u> ${newProduct.stock}</p>
                 <hr />
-                <p class="pProd" id="status-${newProduct.id}"><u>Categoría:</u> ${newProduct.category}</p>
+                <p class="pProd" id="status-${newProduct._id}"><u>Categoría:</u> ${newProduct.category}</p>
                 <hr />
-                <p class="pProd" id="status-${newProduct.id}"><u>Precio:</u> $${newProduct.price}</p>
+                <p class="pProd" id="status-${newProduct._id}"><u>Precio:</u> $${newProduct.price}</p>
                 <footer class="footerProduct">
                     ${innerButtonHTML}
-                    <button class="deleteProductButton" id="delete-${newProduct.id}">Borrar🗑</button>
+                    <button class="deleteProductButton" id="delete-${newProduct._id}">Borrar🗑</button>
                 </footer>
             </article >
         `;
     const h2Total = document.getElementById('h2Total');
-    newTotal = parseInt(h2Total.innerText.split('Total: ')[1]) + 1;
-    h2Total.innerText = 'Total: ' + newTotal;
+    if (h2Total) {
+        newTotal = parseInt(h2Total.innerText.split('Total: ')[1]) + 1;
+        h2Total.innerText = 'Total: ' + newTotal;
+    } else {
+        const newTotalH2 = document.createElement('h2');
+        newTotalH2.id = 'h2Total';
+        newTotalH2.classList = 'hProd';
+        newTotalH2.innerText = 'Total: 1';
+        const titleH1 = document.querySelector('h1');
+        titleH1.insertAdjacentElement('afterend', newTotalH2);
+    }
     divProducts.appendChild(newProdDiv);
-    const imagesDiv = document.getElementById('images-' + newProduct.id);
+    const imagesDiv = document.getElementById('images-' + newProduct._id);
     if (Object.keys(newProduct.thumbnails).length > 0) {
         for (let i = 0; i < Object.keys(newProduct.thumbnails).length; i++) {
             const newThumb = document.createElement('img');
@@ -207,8 +220,8 @@ socket.on('newProduct', (newProduct, clientId) => {
     }
     let statusAction = '';
     newProduct.status ? statusAction = 'disable' : statusAction = 'enable';
-    const statusButton = document.getElementById('status-' + statusAction + "-" + newProduct.id);
-    const deleteButton = document.getElementById('delete-' + newProduct.id);
+    const statusButton = document.getElementById('status-' + statusAction + "-" + newProduct._id);
+    const deleteButton = document.getElementById('delete-' + newProduct._id);
     statusButton.addEventListener('click', (event) => {
         let newStatus = false;
         productId = event.target.id.split('status-disable-')[1];
@@ -219,11 +232,9 @@ socket.on('newProduct', (newProduct, clientId) => {
         socket.emit('status', productId, newStatus);
     });
     deleteButton.addEventListener('click', () => {
-        socket.emit('delete', newProduct.id);
+        socket.emit('delete', newProduct._id);
     });
-    if (socket.id === clientId) {
-        Swal.fire(successSwal);
-    } else {
+    if (socket.id !== clientId) {
         successToast.fire(successSwal);
     }
 });
@@ -285,7 +296,7 @@ async function preConfirm() {
     const stockInput = document.getElementById("stock");
     const smallPriceAlreadyThere = document.getElementById('invalid-helper-price');
     const smallStockAlreadyThere = document.getElementById('invalid-helper-stock');
-    if (!parseInt(priceInput.value)) { //Se verifuca que el valor del precio no sea NaN
+    if (!parseInt(priceInput.value)) { //Se verifica que el valor del precio no sea NaN
         if (!smallPriceAlreadyThere) {
             priceInput.setAttribute("aria-describedby", "invalid-helper-price");
             const smallInvalidHelperPrice = document.createElement('small');
@@ -350,7 +361,7 @@ async function preConfirm() {
                 if (fileInput[i].files[0]) bodyContent.append("thumbnails", fileInput[i].files[0]);
             }
         }
-        const newProductId = await createProduct("http://localhost:8080/api/products", bodyContent);
+        const newProductId = await createProduct("/api/products", bodyContent);
         if (newProductId) {
             socket.emit('newProduct', newProductId);
         }
@@ -388,7 +399,7 @@ function addFileField() {
                     smallInvalidHelperFile.innerText = 'No hay archivo seleccionado';
                     allFileInput[i].insertAdjacentElement('afterend', smallInvalidHelperFile);
                 } else {
-                    smallFileAlreadyExists.innerText = 'No hay archivo seleccionado';
+                    smallFileAlreadyExists.remove();
                 }
             } else {
                 allFileInput[i].ariaInvalid = 'false';

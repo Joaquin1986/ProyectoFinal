@@ -1,191 +1,27 @@
 [
 	{
-		"id": "8055d83b-b2f5-47f5-9561-1396864a39ad",
-		"title": "Coca Cola",
-		"description": "Botella 1L",
-		"price": 450,
-		"thumbnails": [
-			"\\img\\thumbnails\\1722917550472-516739140-refresco-cola.jpg",
-			"\\img\\thumbnails\\1722917550474-114171363-Coca-Cola-Retornable-1-L.webp",
-			"\\img\\thumbnails\\1722917550474-998670030-Refresco-COCA-COLA-1-L-2.webp"
-		],
-		"code": "abc123",
-		"status": true,
-		"stock": 150,
-		"category": "Bebidas no alcoholicas"
+		"id": "7174ea46-9f95-4fd6-86b4-79714cf2feff",
+		"products": []
 	},
 	{
-		"id": "8b9101ea-90a1-4bec-8aa3-ab61a7c04d89",
-		"title": "Vino Tinto",
-		"description": "Botella de 750mL",
-		"price": 1850,
-		"thumbnails": [
-			"\\img\\thumbnails\\1723007698139-827109376-botella-de-vino-tinto-.jpg",
-			"\\img\\thumbnails\\1723008178447-505887752-red-wine3.jpg",
-			"\\img\\thumbnails\\1723008178448-221355935-red-wine4.jpg"
-		],
-		"code": "abc124",
-		"status": true,
-		"stock": 50,
-		"category": "Bebidas alcoholicas"
+		"id": "529649cc-bdac-4663-bdea-fc8feb82be05",
+		"products": [
+			{
+				"product": "924d52b2-df18-4ddd-991e-7d56d7f3a487",
+				"quantity": 5
+			},
+			{
+				"product": "8055d83b-b2f5-47f5-9561-1396864a39ad",
+				"quantity": 9
+			},
+			{
+				"product": "8b9101ea-90a1-4bec-8aa3-ab61a7c04d89",
+				"quantity": 3
+			}
+		]
 	},
 	{
-		"id": "ed857714-c484-4fdc-8277-2ce4377349aa",
-		"title": "Vino Blanco",
-		"description": "Botella de 750mL",
-		"price": 1550,
-		"thumbnails": [
-			"\\img\\thumbnails\\1723130908018-953397122-vino-blanco1.jpg",
-			"\\img\\thumbnails\\1723130908021-608888537-vino-blanco22.jpg",
-			"\\img\\thumbnails\\1723130908026-997191854-vino-blanco3.webp"
-		],
-		"code": "abc127",
-		"status": true,
-		"stock": 120,
-		"category": "Bebidas alcoholicas"
-	},
-	{
-		"id": "92ed9ff4-3a2f-4f7f-951b-f83fa195e907",
-		"title": "Fernet",
-		"description": "Botella de 750mL",
-		"price": 1270,
-		"thumbnails": [
-			"\\img\\thumbnails\\1723137051790-941495767-fernet3.jfif",
-			"\\img\\thumbnails\\1723142254625-833344761-fernet.jpg",
-			"\\img\\thumbnails\\1723142138071-947056656-fernet2.jpg"
-		],
-		"code": "abc125",
-		"status": true,
-		"stock": 80,
-		"category": "Bebidas alcoholicas"
-	},
-	{
-		"id": "5f9f774b-7a4a-4830-a004-4312459d46f4",
-		"title": "Fanta",
-		"description": "Botella de 330mL",
-		"price": 135,
-		"thumbnails": [
-			"\\img\\thumbnails\\1723142691451-267424806-fanta.jpg",
-			"\\img\\thumbnails\\1723142710772-199677378-fanta2.png",
-			"\\img\\thumbnails\\1723142809812-109126149-fanta3.jpg"
-		],
-		"code": "abc126",
-		"status": true,
-		"stock": 150,
-		"category": "Bebidas no alcoholicas"
-	},
-	{
-		"id": "59d14a6b-31e9-42f3-91ff-bdc3da4f1146",
-		"title": "Jugo Naranja",
-		"description": "Caja 1L",
-		"price": 250,
-		"thumbnails": [
-			"\\img\\thumbnails\\1723144385124-538038646-jugo-naranja1.jpg",
-			"\\img\\thumbnails\\1723144385125-455017909-jugo-naranja2.jpg",
-			"\\img\\thumbnails\\1723144385126-712280666-jugo-naranja3.jfif"
-		],
-		"code": "abc131",
-		"status": true,
-		"stock": 95,
-		"category": "Bebidas no alcoholicas"
-	},
-	{
-		"id": "775f97de-1eb4-4cf3-83f1-79c9c8f29ee7",
-		"title": "Sprite",
-		"description": "Botella 1L",
-		"price": 190,
-		"thumbnails": [
-			"\\img\\thumbnails\\1723145201479-382708916-sprite1.jpg",
-			"\\img\\thumbnails\\1723145201486-220607927-sprite2.jpg"
-		],
-		"code": "abc130",
-		"status": true,
-		"stock": 65,
-		"category": "Bebidas no alcoholicas"
-	},
-	{
-		"id": "9c99a213-971b-4d0a-9b5f-0825c98d480a",
-		"title": "Martini",
-		"description": "Botella 995mL",
-		"price": 1360,
-		"thumbnails": [
-			"\\img\\thumbnails\\1723146207620-332255816-martini2.webp",
-			"\\img\\thumbnails\\1723146207621-394870776-martini1.jpg"
-		],
-		"code": "abc129",
-		"status": true,
-		"stock": 45,
-		"category": "Bebidas alcoholicas"
-	},
-	{
-		"id": "fdd1f094-e13e-4028-8ae5-f6e0f06579e3",
-		"title": "Red Bull",
-		"description": "Lata 250mL",
-		"price": 230,
-		"thumbnails": [
-			"\\img\\thumbnails\\1723146448756-638517668-red-bull1.jpg",
-			"\\img\\thumbnails\\1723146448758-744936521-red-bull3.jpg",
-			"\\img\\thumbnails\\1723146448761-339891707-red-bull2.jpg"
-		],
-		"code": "abc128",
-		"status": true,
-		"stock": 150,
-		"category": "Bebidas no alcoholicas"
-	},
-	{
-		"id": "84c6ddc9-5585-4ceb-b460-36deb11c0ab6",
-		"title": "Whisky",
-		"description": "Botella 750mL",
-		"price": 3680,
-		"thumbnails": [
-			"\\img\\thumbnails\\1723155826365-783145151-whisky2.jpg",
-			"\\img\\thumbnails\\1723155826366-585765016-whisky1.jpg"
-		],
-		"code": "abc132",
-		"status": true,
-		"stock": 16,
-		"category": "Bebidas alcoholicas"
-	},
-	{
-		"id": "5b082e6d-035d-43e6-a5be-c9a9d4d279e2",
-		"title": "Jugo de Pomelo",
-		"description": "Envase de 1L",
-		"price": 240,
-		"thumbnails": [
-			"\\img\\thumbnails\\1723167061840-672352642-jugo-pomelo2.jpg",
-			"\\img\\thumbnails\\1723167061843-912017768-jugo-pomelo3.jpg"
-		],
-		"code": "abc002",
-		"status": true,
-		"stock": 63,
-		"category": "Bebidas no alcoholicas"
-	},
-	{
-		"id": "924d52b2-df18-4ddd-991e-7d56d7f3a487",
-		"title": "Limonada Natural",
-		"description": "Envase de 1L",
-		"price": 360,
-		"thumbnails": [
-			"\\img\\thumbnails\\1723167370308-574846245-limonada_web.jpg",
-			"\\img\\thumbnails\\1723167370310-127518830-limonada-natural.jpg"
-		],
-		"code": "abc003",
-		"status": true,
-		"stock": 20,
-		"category": "Bebidas no alcoholicas"
-	},
-	{
-		"id": "049f7030-c3fc-4d65-b829-9a69147391e1",
-		"title": "Jugo de Remolacha",
-		"description": "Botella 1L",
-		"price": 380,
-		"thumbnails": [
-			"\\img\\thumbnails\\1723167574982-564568982-jugo-remolacha.webp",
-			"\\img\\thumbnails\\1723167574983-718025314-jugo-remolacha3.webp"
-		],
-		"code": "ABC365",
-		"status": true,
-		"stock": 30,
-		"category": "Bebidas no alcoholicas"
+		"id": "ad1c5d3d-28d4-4700-8bc6-1ccb205d216c",
+		"products": []
 	}
 ]
