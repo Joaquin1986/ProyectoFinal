@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { ProductManager } = require('../../controllers/ProductManagerDB');
+const { ProductManager } = require('../../controllers/ProductManager');
 
 const productsViewsRouter = Router();
 const splideCss = 'https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css';

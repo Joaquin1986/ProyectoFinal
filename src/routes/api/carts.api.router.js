@@ -1,6 +1,6 @@
 // Se realizan los imports mediante 'require', de acuerdo a lo visto en clase
 const { Router } = require('express');
-const { Cart, CartManager } = require('../../controllers/CartManagerDB');
+const { Cart, CartManager } = require('../../controllers/CartManager.js');
 const { Order, OrderManager } = require('../../controllers/OrderManager.js');
 
 const cartsApiRouter = Router();

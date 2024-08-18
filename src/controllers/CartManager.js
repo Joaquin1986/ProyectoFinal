@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const cartModel = require('../models/cart.model.js');
-const { ProductManager } = require('./ProductManagerDB.js');
+const { ProductManager } = require('./ProductManager.js');
 
 // Clase Cart, con su correspondiente contructor las props definidas en la consigna
 class Cart {

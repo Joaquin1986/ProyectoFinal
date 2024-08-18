@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { Product, ProductManager } = require('../../controllers/ProductManagerDB');
+const { Product, ProductManager } = require('../../controllers/ProductManager');
 const { uploadMulter } = require('../../utils/utils');
 
 const productsApiRouter = Router();

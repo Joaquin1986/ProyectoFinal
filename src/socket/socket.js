@@ -1,5 +1,5 @@
 const { Server } = require('socket.io');
-const { ProductManager } = require('../controllers/ProductManagerDB');
+const { ProductManager } = require('../controllers/ProductManager');
 
 /* Tanto la baja como el cambio de status de los productos se realizan mediante SocketIO. Sin embargo, 
    la creación de nuevos productos se realiza mediante fetch (método POST) hacia el Endpoint/API
