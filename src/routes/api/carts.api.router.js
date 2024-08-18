@@ -1,6 +1,7 @@
 // Se realizan los imports mediante 'require', de acuerdo a lo visto en clase
 const { Router } = require('express');
-const { Cart, CartManager } = require('../../controllers/CartManagerBD');
+const { Cart, CartManager } = require('../../controllers/CartManagerDB');
+const { Order, OrderManager } = require('../../controllers/OrderManager.js');
 
 const cartsApiRouter = Router();
 
@@ -16,7 +17,7 @@ cartsApiRouter.get("/carts/:cid", async (req, res) => {
 
         }
     } else {
-        res.status(400).json({ "⛔Error:": "Request invalido" });
+        res.status(400).json({ "⛔Error:": "Request no válido" });
     }
 });
 
@@ -24,25 +25,63 @@ cartsApiRouter.post("/carts", async (req, res) => {
     try {
         const newCart = new Cart();
         const result = await CartManager.addCart(newCart);
-        result ? res.status(201).json({ "cartId": result }) : res.status(500).json({
+        result ? res.status(201).json({ "cartId": result }) : res.status(400).json({
             "⛔Error:":
-                "Hubo un error interno del servidor al crear el carrito"
+                "Request no válido"
         });
     } catch (error) {
         res.status(500).json({ "⛔Error interno:": error.message });
     }
 });
 
-// De acuerdo a la consigna, por ahora, solo suma de a 1 la cantidad
 cartsApiRouter.put("/carts/:cid/product/:pid", async (req, res) => {
     const { cid, pid } = req.params;
-    const quantity = 1;  // A VER QUE DICE LA LETRA; SINO SERIA => const { quantity } = req.body;
-    try {
-        const result = await CartManager.addProductToCart(cid, pid, quantity);
-        if (result) return res.status(200).json({ 'productAdded': pid, 'inCart': cid, 'quantity': quantity });
-        return res.status(400).json({ '⛔Error': 'Request no válido' });
-    } catch (error) {
-        return res.status(500).json({ "⛔Error interno:": error.message });
+    const { quantity } = req.body;
+    if (cid && pid && quantity) {
+        try {
+            const result = await CartManager.addProductToCart(cid, pid, quantity);
+            if (result === true) return res.status(200).json({ 'productAdded': pid, 'inCart': cid, 'quantity': quantity });
+            else if (result === -1) return res.status(400).json({ 'error': 'Stock insuficiente' });
+            return res.status(400).json({ 'error': 'Request no válido' });
+        } catch (error) {
+            return res.status(500).json({ "internalError": error.message });
+        }
+    } return res.status(400).json({ 'error': 'Request no válido' });
+});
+
+cartsApiRouter.post("/carts/:cid/order", async (req, res) => {
+    const { cid: cartId } = req.params;
+    const { name, address, email, paymentMehod } = req.body;
+    if (cartId && name && address && email && (paymentMehod.toLowerCase() === 'cash' || paymentMehod.toLowerCase() === 'card')) {
+        try {
+            const cartAlreadyOrdered = await OrderManager.isCartAldreadyOrdered(cartId);
+            if (cartAlreadyOrdered) {
+                return res.status(400).json({
+                    "error":
+                        "Orden ya finalizada"
+                })
+            }
+            const cartExists = await CartManager.getCartById(cartId);
+            if (cartExists) {
+                const newOrder = new Order(cartExists._id, name, address, email, paymentMehod.toLowerCase());
+                const result = await OrderManager.addOrder(newOrder);
+                if (result) {
+                    res.status(201).json({ "order": result._id });
+                }
+            } else {
+                res.status(400).json({
+                    "error":
+                        "Request no válido"
+                })
+            }
+        } catch (error) {
+            res.status(500).json({ "internalError": error.message });
+        }
+    } else {
+        res.status(400).json({
+            "error":
+                "Request no válido, revisar valores enviados"
+        })
     }
 });
 

@@ -2,15 +2,17 @@
 const express = require('express');
 const handlebars = require('express-handlebars');
 const path = require('path');
+
 const productsApiRouter = require('./routes/api/products.api.router.js');
 const cartsApiRouter = require('./routes/api/carts.api.router.js');
+
 const productsViewsRouter = require('./routes/views/products.views.router.js');
 const cartsViewsRouter = require('./routes/views/carts.views.router.js');
 const { publicPath, viewsPath } = require("./utils/utils.js");
+
 const initServer = require('./server/server.js');
 const connectMongoDB = require('./db/mongodb.js');
 
-// Se crea el server Express con el puerto correspondiente
 const app = express();
 
 initServer(app).then(() => {
@@ -25,6 +27,7 @@ initServer(app).then(() => {
 
     app.use('/api', productsApiRouter);
     app.use('/api', cartsApiRouter);
+    
     app.use('/views', productsViewsRouter);
     app.use('/views', cartsViewsRouter);
 

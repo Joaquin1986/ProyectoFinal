@@ -12,6 +12,7 @@
     <hr />
     <div id="cartDetailsDiv">
         {{#if cart}}
+        {{#if renderCart}}
         {{#if cart.products}}
         <article>
             <header>
@@ -52,10 +53,11 @@
                 </tfoot>
             </table>
             <footer>
-                <div role="button" class="primary" tabindex="0" id="cartCheckoutButton">Enviar Orden📦</div>
-                <div role="button" class="secondary" onclick="deleteCart('/api/carts/{{cart._id}}')" tabindex="0"
+                <div role="button" class="primary" tabindex="0" id="cartCheckoutButton" onclick="printOrderForm()">
+                    Enviar Orden📦</div>
+                <div role="button" class="secondary" onclick="deleteCart('/api/carts/{{cart._id}}')" tabindex="1"
                     id="cartDeleteButton">Borrar Carrito 🗑</div>
-                <div role="button" class="secondary" onclick="backToProducts(event)" tabindex="0" id="cartBackButton">
+                <div role="button" class="secondary" onclick="backToProducts(event)" tabindex="2" id="cartBackButton">
                     Volver
                     a Productos 🏡</div>
             </footer>
@@ -63,6 +65,11 @@
         {{else}}
         <div id="cartNoValidDiv">
             <h2 id="noProductsH2">Carrito vacío esperando que <a href="/views/products">elijas productos 📦</a></h2>
+        </div>
+        {{/if}}
+        {{else}}
+        <div id="cartNoValidDiv">
+            <h2 id="noProductsH2">Orden finalizada ⛔</h2>
         </div>
         {{/if}}
         {{else}}

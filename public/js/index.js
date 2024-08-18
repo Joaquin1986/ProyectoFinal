@@ -102,8 +102,11 @@ function displayCartinNav(productsCount) {
 
 
 function buyProductButton(event) {
-  event.target.disabled = true;
-  event.target.setAttribute('aria-busy', 'true');
-  event.target.innerText = ''
+  const buyProductButtons = document.getElementsByClassName('buyProductButton');
+  for (let i = 0; i < buyProductButtons.length; i++) {
+    buyProductButtons[i].disabled = true;
+    buyProductButtons[i].setAttribute('aria-busy', 'true');
+    buyProductButtons[i].innerText = '';
+  }
   window.location.href = '/views/products/' + event.target.id;
 }

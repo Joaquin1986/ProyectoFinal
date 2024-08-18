@@ -35,7 +35,7 @@ class CartManager {
         }
     }
 
-    // Agrega un producto al array 'products'
+    // Agrega un producto a la BD
     static async addCart(cart) {
         try {
             const newCart = await cartModel.create(cart);
@@ -52,15 +52,22 @@ class CartManager {
             if (mongoose.isValidObjectId(cartId) || mongoose.isValidObjectId(productId) || !parseInt(quantity)) {
                 const cartExists = await this.getCartById(cartId);
                 const productExists = await ProductManager.getProductById(productId);
-                if (cartExists && productExists) {
+                if (cartExists && productExists && productExists.status) {
                     const cart = await cartModel.findOne({ _id: cartId });
                     let productIndexInCart = cartExists.products.findIndex(element => element.product == productId);
                     if (productIndexInCart === -1) {
-                        cart.products.push({ 'product': productId, 'quantity': quantity });
-                        await cart.save();
+                        if (quantity > productExists.stock) return -1
+                        else {
+                            cart.products.push({ 'product': productId, 'quantity': quantity });
+                            await cart.save();
+                        }
                     } else {
-                        cart.products[productIndexInCart].quantity += quantity;
-                        await cart.save();
+                        if ((cart.products[productIndexInCart].quantity + quantity) > productExists.stock)
+                            return -1
+                        else {
+                            cart.products[productIndexInCart].quantity += quantity;
+                            await cart.save();
+                        }
                     }
                     console.log(`✅ +${quantity} de producto #${productId} agregado al carrito #${cartId}`);
                     return true;

@@ -1,6 +1,7 @@
 const http = require('http');
 const initSocket = require('../socket/socket.js');
 
+// Se crea el server Express con el puerto definido
 const initServer = async (app) => {
     const server = http.createServer(app);
     const port = 8080;

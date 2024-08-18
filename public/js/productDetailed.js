@@ -3,7 +3,7 @@ const basicToast = {
   toast: true,
   position: "top-end",
   showConfirmButton: false,
-  timer: 1500,
+  timer: 1000,
   timerProgressBar: false,
 };
 const errorToast = Swal.mixin({ ...basicToast, background: '#bb0606' });
@@ -107,17 +107,17 @@ async function addProductToCart(url, quantity) {
       },
       body: JSON.stringify({ "quantity": quantity })
     });
+    const result = await response.json();
     if (response.ok) {
-      const result = await response.json();
       successToast.fire({
         text: `+${quantity} ${productName} al carrito`,
         icon: "success"
-      });
+      }).then(() => window.location.href = '/views/products');
       return result;
     } else {
       errorToast.fire({
         icon: "error",
-        text: "Error al crear un carrito"
+        text: "Error al agregar el producto al carrito: " + Object.values(result)[0]
       });
       return false;
     }
@@ -176,6 +176,8 @@ function displayCartinNav(productsCount) {
 function backToProducts(event) {
   const addToCartButton = document.getElementById('addToCartButton');
   addToCartButton.disabled = true;
+  addToCartButton.setAttribute('aria-busy', 'true');
+  addToCartButton.innerText = ''
   event.target.disabled = true;
   event.target.setAttribute('aria-busy', 'true');
   event.target.innerText = ''
@@ -183,16 +185,24 @@ function backToProducts(event) {
 }
 
 async function addToCart(event) {
-  event.target.disabled = true;
-  event.target.setAttribute('aria-busy', 'true');
-  event.target.innerText = ''
+  const backToProductsButton = document.getElementById('backToProductsButton');
+  const removeProductDetailDisplay = document.getElementById('removeProductDetailDisplay');
+  const addProductDetailDisplay = document.getElementById('addProductDetailDisplay');
   const url = '/api/carts/' + currentCartId + '/product/' + productId;
   const result = await addProductToCart(url, itemCount.innerText);
   const productsCount = document.getElementById('navCartButton');
   const lastCount = parseInt(productsCount.innerText.split('🛒')[1]);
-  productsCount.innerText = '🛒' + (lastCount + parseInt(result.quantity));
-  event.target.disabled = false;
-  event.target.ariaBusy = false;
-  event.target.innerText = 'Agregar 🛒';
-  itemCount.innerText = '1';
+  if (result) {
+    disableButton(event.target);
+    disableButton(backToProductsButton);
+    disableButton(removeProductDetailDisplay);
+    disableButton(addProductDetailDisplay); 
+    productsCount.innerText = '🛒' + (lastCount + parseInt(result.quantity));
+  }
+}
+
+function disableButton(button) {
+  button.disabled = true;
+  button.setAttribute('aria-busy', 'true');
+  button.innerText = '';
 }

@@ -29,6 +29,7 @@
     border-radius: 80px;
     font-size: larger;
     transition: 0.2s;
+    z-index: 999;
 }
 
 #addButton:hover,
@@ -37,6 +38,7 @@
     border-color: #c2c7d0;
     border-width: 1px;
     background-color: #138bcc;
+    z-index: 998;
 }
 
 .product {
@@ -105,7 +107,8 @@ input {
 
 
 #text404Div,
-#cartNoValidDiv {
+#cartNoValidDiv,
+#orderSucceededDiv {
     display: flex;
     justify-content: center;
     padding-top: 150px;
@@ -143,16 +146,17 @@ input {
 
 #cartCheckoutButton,
 #addToCartButton,
-#cartDeleteButton {
+#cartDeleteButton,
+#placeOrderButton {
     margin-bottom: 20px;
 }
 
-#cartDeleteButton{
+#cartDeleteButton {
     background-color: #a01f1f;
     border-color: #5c1313;
 }
 
-#cartDeleteButton:hover{
+#cartDeleteButton:hover {
     filter: brightness(105%);
 }
 
@@ -163,6 +167,10 @@ input {
 
 #navCartButton:hover {
     filter: brightness(120%);
+}
+
+#cartBackButtonThird {
+    margin-top: 50px;
 }
 
 /* MEDIA QUERIES PARA ADAPTAR EL SITIO A LA RESOLUCIÓN DE PANTALLA */

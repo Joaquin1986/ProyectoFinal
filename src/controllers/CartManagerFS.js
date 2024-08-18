@@ -15,6 +15,7 @@ class Cart {
     constructor() {
         this.id = uuidv4();
         this.products = [];
+        this.status = true;
     }
 }
 
