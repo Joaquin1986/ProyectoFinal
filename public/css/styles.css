@@ -173,6 +173,17 @@ input {
     margin-top: 50px;
 }
 
+#spanPaginate {
+    display: flex;
+    justify-content: center;
+}
+
+#spanPaginate a,
+#spanPaginate p {
+    margin-right: 20px;
+    margin-bottom: 20px;
+}
+
 /* MEDIA QUERIES PARA ADAPTAR EL SITIO A LA RESOLUCIÓN DE PANTALLA */
 
 @media only screen and (max-width: 768px) {

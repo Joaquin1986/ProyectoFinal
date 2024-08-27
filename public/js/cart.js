@@ -116,7 +116,7 @@ function displayProductsInTable(products, cartId) {
             newTr.innerHTML = `
                  <th scope="row">${product.product.title}</th>
                         <td>${product.quantity}</td>
-                        <td>${product.product.price}</td>
+                        <td>$${product.product.price}</td>
                         <td><button class="outline secondary" id="remove-${product.product._id}"
                                 onclick="removeProductFromCart(event)">🗑</button></td>
             `;
@@ -146,19 +146,19 @@ function displayProductsInTable(products, cartId) {
                     <tr>
                         <th scope="row"><b>Subtotal</b></th>
                         <td><b>${Object.values(products).length}</b></td>
-                        <td><b>${totalPrice}</b></td>
+                        <td><b>$${totalPrice}</b></td>
                         <td></td>
                     </tr>
                     <tr>
                         <th scope="row"><b>Total(IVA 23%)</b></th>
                         <td><b>${Object.values(products).length}</b></td>
-                        <td><b>${Math.round(totalPrice * 1.23)}</b></td>
+                        <td><b>$${Math.round(totalPrice * 1.23)}</b></td>
                         <td></td>
                     </tr>
                 </tfoot>
             </table>
             <footer>
-                <div role="button" class="primary" tabindex="0" id="cartCheckoutButton">Enviar Orden📦</div>
+                <div role="button" class="primary" tabindex="0" id="cartCheckoutButton" onclick="printOrderForm()">Enviar Orden📦</div>
                 <div role="button" class="secondary" onclick="deleteCart('/api/carts/${cartId}')" tabindex="0"
                     id="cartDeleteButton">Borrar Carrito 🗑</div>
                 <div role="button" class="secondary" onclick="backToProducts(event)" tabindex="0" id="cartBackButton">
@@ -268,7 +268,6 @@ function printOrderForm() {
 
 async function placeNewOrder() {
     const form = document.querySelector('form');
-    // const formData = new FormData(form);
     const name = document.getElementById('nameInput').value;
     const address = document.getElementById('addressInput').value;
     const email = document.getElementById('emailInput').value;
@@ -309,7 +308,7 @@ async function placeNewOrder() {
                 const cartDetailsDiv = document.getElementById('cartDetailsDiv');
                 cartDetailsDiv.innerHTML = '';
                 const orderSucceededDiv = document.createElement('div');
-                orderSucceededDiv.innerHTML = `<h1>Su orden #${result.order} ha sido confirmada! ✅</h1>`;
+                orderSucceededDiv.innerHTML = `<h1>Orden #${result.order} confirmada! ✅</h1>`;
                 orderSucceededDiv.id = 'orderSucceededDiv';
                 cartDetailsDiv.appendChild(orderSucceededDiv);
                 const backButtonDiv = document.createElement('div');
@@ -330,7 +329,6 @@ async function placeNewOrder() {
                 });
             }
         } catch (error) {
-            console.log(error)
             Swal.fire({
                 icon: "error",
                 title: "Error!",

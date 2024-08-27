@@ -1,7 +1,8 @@
 // Se realizan los imports mediante 'require', de acuerdo a lo visto en clase
 const { Router } = require('express');
-const { Cart, CartManager } = require('../../controllers/CartManager.js');
-const { Order, OrderManager } = require('../../controllers/OrderManager.js');
+const { Cart, CartManager } = require('../../controllers/CartManager');
+const { Order, OrderManager } = require('../../controllers/OrderManager');
+const { ProductManager } = require('../../controllers/ProductManager');
 
 const cartsApiRouter = Router();
 
@@ -14,7 +15,6 @@ cartsApiRouter.get("/carts/:cid", async (req, res) => {
             return res.status(404).json({ "⛔Error": `Carrito id '${cid}' no encontrado` });
         } catch (error) {
             res.status(500).json({ "⛔Error interno:": error.message });
-
         }
     } else {
         res.status(400).json({ "⛔Error:": "Request no válido" });
@@ -61,11 +61,12 @@ cartsApiRouter.post("/carts/:cid/order", async (req, res) => {
                         "Orden ya finalizada"
                 })
             }
-            const cartExists = await CartManager.getCartById(cartId);
+            const cartExists = await CartManager.getPopulatedCartById(cartId);
             if (cartExists) {
                 const newOrder = new Order(cartExists._id, name, address, email, paymentMehod.toLowerCase());
                 const result = await OrderManager.addOrder(newOrder);
                 if (result) {
+                    ProductManager.updateOrderedProductsStock(cartExists.products);
                     res.status(201).json({ "order": result._id });
                 }
             } else {

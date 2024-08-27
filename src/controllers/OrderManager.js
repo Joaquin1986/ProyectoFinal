@@ -43,8 +43,11 @@ class OrderManager {
     static async addOrder(order) {
         try {
             const newOrder = await orderModel.create(order);
-            console.log(`✅ Orden #'${newOrder._id}' agregada exitosamente a la BD`);
-            return newOrder._id;
+            if (newOrder) {
+                console.log(`✅ Orden #'${newOrder._id}' agregada exitosamente a la BD`);
+                return newOrder._id;
+            }
+            return false;
         } catch (error) {
             throw new Error(`⛔ Error: No se pudo crear la orden en la BD => error: ${error.message}`);
         }

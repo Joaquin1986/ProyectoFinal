@@ -5,11 +5,14 @@ const orderSchema = new Schema({
     cart: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'cart',
-        required: [true, "identificación del carrito es obligatoria"]
+        required: [true, "identificación del carrito es obligatoria"],
+        index: true,
+        unique: true
     },
     name: {
         type: String,
-        required: [true, "el nombre es obligatorio"]
+        required: [true, "el nombre es obligatorio"],
+        index: true
     },
     address: {
         type: String,

@@ -42,7 +42,18 @@
         </div>
         {{/each}}
     </div>
-    <h2 class="hProd" id="h2Total">Total: {{products.length}}</h2>
+    <span id="spanPaginate">
+        {{#if details.hasPrevPage}}
+        <a href="{{details.firstLink}}">⏮Primera</a>
+        <a href="{{details.prevLink}}">◀Anterior </a>
+        {{/if}}
+        <p>Página {{details.page}} de {{details.totalPages}}</p>
+        {{#if details.hasNextPage}}
+        <a href="{{details.nextLink}}"> Siguiente▶</a>
+        <a href="{{details.lastLink}}"> Última⏭</a>
+        {{/if}}
+    </span>
+    <h2 class="hProd" id="h2Total">Total: {{details.totalDocs}}</h2>
     {{else}}
     <h2 id="noProductsH2">No hay productos para mostrar ⛔</h2>
 

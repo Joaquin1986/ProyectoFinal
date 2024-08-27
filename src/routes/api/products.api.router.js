@@ -1,29 +1,59 @@
 const { Router } = require('express');
 const { Product, ProductManager } = require('../../controllers/ProductManager');
-const { uploadMulter } = require('../../utils/utils');
+const { uploadMulter, buildResponseForApi } = require('../../utils/utils');
 
 const productsApiRouter = Router();
 const maxFilesAllowed = 5;
 
 productsApiRouter.get("/products", async (req, res) => {
-    const { limit } = req.query;
-    if (!limit || parseInt(limit) === 0) {
-        const products = await ProductManager.getProducts().lean();
-        if (products.length === 0) return res.status(200).json({ "Productos": "Sin productos creados" });
-        return res.status(200).json({ "Productos": products });
+    let { limit, page, sort, query } = req.query;
+    if (sort && (sort.toLocaleLowerCase() !== 'asc' && sort.toLocaleLowerCase() !== 'desc')) sort = false;
+    limit = parseInt(limit);
+    page = parseInt(page);
+    let criteria = {};
+    let options = {};
+    if (!limit || limit < 1) limit = 10;
+    if (!page || page < 1) page = 1;
+    console.log(limit, page)
+    if (query) {
+        query = query.toLocaleLowerCase();
+        if (query === 'available') criteria = { "status": true };
+        else criteria = { "category": query };
     }
-    if (!parseInt(limit) || limit < 1) return res.status(400).json({ "⛔Error": "Límite establecido no válido" })
-    const result = await ProductManager.getProducts();
-    const products = result;
-    const filteredProducts = products.slice(0, limit);
-    return res.status(200).json(filteredProducts);
+    sort ? options = { "limit": limit, "page": page, "sort": sort }
+        : options = { "limit": limit, "page": page };
+    let response;
+    try {
+        console.log(criteria, options);
+        response = buildResponseForApi(await ProductManager.getPaginatedProducts(criteria, options));
+        return res.status(200).json(response);
+    } catch {
+        response = {
+            status: "error",
+            payload: [],
+            totalPages: 0,
+            prevPage: null,
+            nextPage: null,
+            page: 0,
+            hasPrevPage: false,
+            hasNextPage: false,
+            prevLink: null,
+            nextLink: null,
+        };
+        return res.status(500).json(response);
+    }
 });
 
 productsApiRouter.get("/products/:pid", async (req, res) => {
     const { pid } = req.params;
-    const product = await ProductManager.getProductById(pid);
-    if (product) return res.status(200).json(product);
-    return res.status(404).json({ "⛔Error": `Producto id #${pid} no encontrado` });
+    try {
+        const product = await
+            ProductManager.getProductById(pid);
+        if (product) return res.status(200).json(product);
+        return res.status(404).json({ "⛔Error": `Producto id #${pid} no encontrado` });
+    } catch (error) {
+        return res.status(500).json({ "⛔Error interno:": error.message });
+    }
 });
 
 // Al siguiente endpoint (POST) se le puede pasar un array llamado 'thumbnails" por Multer
@@ -70,7 +100,7 @@ productsApiRouter.post("/products", uploadMulter.array('thumbnails'), async (req
    Se pueden enviar también los valores  'deleteThumbIndex' como un array.
    Unicos status permitidos: true o false. Valor por defecto siempre es true, a menos que se especifique false.*/
 
-   productsApiRouter.put("/products/:pid", uploadMulter.array('thumbnails'), async (req, res) => {
+productsApiRouter.put("/products/:pid", uploadMulter.array('thumbnails'), async (req, res) => {
     const changesDone = [];
     const { pid } = req.params
     const { body } = req;

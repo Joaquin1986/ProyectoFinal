@@ -12,7 +12,7 @@ class Cart {
 // Clase CartManager con su constructor tal como se solicitó, con un array 'products' vacío
 class CartManager {
 
-    // En caso de encontrarlo, devuelve el carrito de acuerdo al id proporcionado por argumento
+    // Devuelve el carrito como objeto plano, de acuerdo al id proporcionado por argumento
     static async getCartById(id) {
         try {
             if (mongoose.isValidObjectId(id)) {
@@ -24,10 +24,11 @@ class CartManager {
         }
     }
 
+    // Devuelve el carrito como un documento MongoDB
     static async getPopulatedCartById(id) {
         try {
             if (mongoose.isValidObjectId(id)) {
-                return await cartModel.findOne({ _id: id }).populate('products.product').lean();
+                return await cartModel.findOne({ _id: id });
             }
             return undefined;
         } catch (error) {
@@ -48,15 +49,17 @@ class CartManager {
 
     // Agrega una cantidad de cierto producto (productId) a determinado carrito (cartId)
     static async addProductToCart(cartId, productId, quantity) {
+        quantity = parseInt(quantity);
         try {
-            if (mongoose.isValidObjectId(cartId) || mongoose.isValidObjectId(productId) || !parseInt(quantity)) {
+            if (mongoose.isValidObjectId(cartId) || mongoose.isValidObjectId(productId) || quantity) {
                 const cartExists = await this.getCartById(cartId);
                 const productExists = await ProductManager.getProductById(productId);
                 if (cartExists && productExists && productExists.status) {
                     const cart = await cartModel.findOne({ _id: cartId });
-                    let productIndexInCart = cartExists.products.findIndex(element => element.product == productId);
+                    let productIndexInCart = cartExists.products.findIndex(element => element.product._id.toString() === productId);
                     if (productIndexInCart === -1) {
-                        if (quantity > productExists.stock) return -1
+                        if (quantity > productExists.stock)
+                            return -1
                         else {
                             cart.products.push({ 'product': productId, 'quantity': quantity });
                             await cart.save();
@@ -92,7 +95,7 @@ class CartManager {
                 const productExists = await ProductManager.getProductById(pid);
                 if (cartExists && productExists) {
                     while (!productFoundInCart && productSearchIndex < Object.values(cartExists.products).length) {
-                        if (Object.values(cartExists.products)[productSearchIndex].product.toString() === pid) {
+                        if (Object.values(cartExists.products)[productSearchIndex].product._id.toString() === pid) {
                             productFoundInCart = true;
                         }
                         productSearchIndex++;
@@ -131,7 +134,7 @@ class CartManager {
                 const productExists = await ProductManager.getProductById(pid);
                 if (cartExists && productExists) {
                     while (!productDeletedFromCart && productSearchIndex < Object.values(cartExists.products).length) {
-                        if (Object.values(cartExists.products)[productSearchIndex].product.toString() === pid) {
+                        if (Object.values(cartExists.products)[productSearchIndex].product._id.toString() === pid) {
                             cartExists.products.splice(productSearchIndex, 1);
                             await cartExists.save();
                             productDeletedFromCart = true;

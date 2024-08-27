@@ -2,6 +2,7 @@ const path = require('path');
 const multer = require('multer');
 const fs = require('fs');
 
+const baseURL = "http://localhost:8080/";
 const publicPath = path.join(__dirname, '../../public');
 const viewsPath = path.join(__dirname, '../views');
 const thumbnailsPath = path.join(__dirname, '../../public/img/thumbnails');
@@ -34,10 +35,49 @@ Descripción del error: ${error.message}`);
     }
 }
 
+const preBuildResponse = (data) => {
+    const response = {
+        "status": 'success',
+        "payload": data.docs,
+        "totalPages": data.totalPages,
+        "prevPage": data.prevPage,
+        "nextPage": data.nextPage,
+        "page": data.page,
+        "hasPrevPage": data.hasPrevPage,
+        "hasNextPage": data.hasNextPage
+    }
+    return response;
+}
+
+const buildResponseForApi = (data) => {
+    const preData = preBuildResponse(data);
+    const response = {
+        ...preData,
+        "prevLink": `${baseURL}api/products?limit=${data.limit}&page=${data.prevPage}`,
+        "nextLink": `${baseURL}api/products?limit=${data.limit}&page=${data.nextPage}`
+    }
+    return response;
+}
+
+const buildResponseForView = (data) => {
+    const preData = preBuildResponse(data);
+    const response = {
+        ...preData,
+        "prevLink": `${baseURL}views/products?limit=${data.limit}&page=${data.prevPage}`,
+        "nextLink": `${baseURL}views/products?limit=${data.limit}&page=${data.nextPage}`,
+        "firstLink": `${baseURL}views/products?limit=${data.limit}&page=1`,
+        "lastLink": `${baseURL}views/products?limit=${data.limit}&page=${data.totalPages}`,
+        "totalDocs": data.totalDocs
+    }
+    return response;
+}
+
 module.exports = {
     uploadMulter,
     publicPath,
     viewsPath,
     thumbnailsPath,
-    readJsonDataFromFile
+    readJsonDataFromFile,
+    buildResponseForApi,
+    buildResponseForView
 };

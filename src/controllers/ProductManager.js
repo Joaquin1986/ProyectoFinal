@@ -43,17 +43,44 @@ class ProductManager {
     }
 
     // Devuelve todos los productos creados hasta el momento en la BD
-    static getProducts() {
+    static async getProducts() {
         try {
-            return productModel.find().lean();
+            return await productModel.find().lean();
         } catch (error) {
             throw new Error(`⛔ Error al obtener datos de la BD: ${error.message}`);
         }
     }
 
-    static getEnabledProducts() {
+    // Devuelve los productos con paginate
+    static async getPaginatedProducts(criteria, options) {
         try {
-            return productModel.find({ status: true }).lean();
+            return await productModel.paginate(criteria, options);
+        } catch (error) {
+            throw new Error(`⛔ Error al obtener datos de la BD: ${error.message}`);
+        }
+    }
+
+    // // Devuelve los productos con paginate
+    // static async getPaginatedProducts(limit, page) {
+    //     try {
+    //         return await productModel.paginate({}, { limit: limit, page: page });
+    //     } catch (error) {
+    //         throw new Error(`⛔ Error al obtener datos de la BD: ${error.message}`);
+    //     }
+    // }
+
+    // // Devuelve los productos con paginate
+    // static async getPaginatedSortedByPriceProducts(limit, page, sort) {
+    //     try {
+    //         return await productModel.paginate({}, { limit: limit, page: page, sort: { price: sort } });
+    //     } catch (error) {
+    //         throw new Error(`⛔ Error al obtener datos de la BD: ${error.message}`);
+    //     }
+    // }
+
+    static async getEnabledProducts(limit, page) {
+        try {
+            return await productModel.paginate({ status: true }, { limit: limit, page: page, lean: true });
         } catch (error) {
             throw new Error(`⛔ Error al obtener datos de la BD: ${error.message}`);
         }
@@ -74,7 +101,7 @@ class ProductManager {
     // En caso de encontrarlo, devuelve un objeto 'Producto' de acuerdo al codigo proporcionado por argumento.
     // En caso de no encontrarlo, imprime error en la consola.
     static async getProductByCode(code) {
-        return await productModel.findOne({ code: code }).lean();
+        return await productModel.findOne({ code: { '$regex': code, $options: 'i' } }).lean();
     } catch(error) {
         throw new Error(`⛔ Error: No se pudo verificFar si existe el producto con el código: ${code} => error: ${error.message}`);
     }
@@ -171,7 +198,7 @@ class ProductManager {
         }
     }
 
-    // Elimina una thumbnail de cierto producto
+    // Elimina una thumbnail de un obj producto que se reciben por argumento
     static async removeThumbnailFromProduct(path, product) {
         const pathParsed = String(path).toLowerCase();
         let index = 0;
@@ -186,6 +213,19 @@ class ProductManager {
         }
         return product;
     }
+
+    // Actualiza el stock de productos luego de haber recibido una orden
+    static async updateOrderedProductsStock(products) {
+        try {
+            for (let count = 0; count < products.length; count++) {
+                const newStock = products[count].product.stock - products[count].quantity;
+                await productModel.updateOne({ _id: products[count].product._id }, { $set: { stock: newStock } });
+            }
+        } catch (error) {
+            throw new Error(`⛔ Error: No se pudo actualizar el stock de los productos: ${error.message}`);
+        }
+    }
+
 }
 
 module.exports = {

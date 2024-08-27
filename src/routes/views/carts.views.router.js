@@ -6,7 +6,7 @@ const cartsViewsRouter = Router();
 
 cartsViewsRouter.get('/carts/:cid', async (req, res) => {
     const { cid } = req.params;
-    const cart = await CartManager.getPopulatedCartById(cid);
+    const cart = await CartManager.getCartById(cid);
     let productsTotalCount = 0;
     let totalPrice = 0;
     let title = "APP -> ";
@@ -28,11 +28,6 @@ cartsViewsRouter.get('/carts/:cid', async (req, res) => {
         cart: cart, title: title, productsTotal: productsTotalCount,
         totalPrice: totalPrice, totalPriceWithTaxes: totalPriceWithTaxes, renderCart: renderCart
     });
-});
-
-cartsViewsRouter.get('/*', (req, res) => {
-    const title = "Sitio no encontrado 🔎";
-    res.render('notFound404', { title: title });
 });
 
 module.exports = cartsViewsRouter;
