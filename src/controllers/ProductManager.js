@@ -60,32 +60,6 @@ class ProductManager {
         }
     }
 
-    // // Devuelve los productos con paginate
-    // static async getPaginatedProducts(limit, page) {
-    //     try {
-    //         return await productModel.paginate({}, { limit: limit, page: page });
-    //     } catch (error) {
-    //         throw new Error(`⛔ Error al obtener datos de la BD: ${error.message}`);
-    //     }
-    // }
-
-    // // Devuelve los productos con paginate
-    // static async getPaginatedSortedByPriceProducts(limit, page, sort) {
-    //     try {
-    //         return await productModel.paginate({}, { limit: limit, page: page, sort: { price: sort } });
-    //     } catch (error) {
-    //         throw new Error(`⛔ Error al obtener datos de la BD: ${error.message}`);
-    //     }
-    // }
-
-    static async getEnabledProducts(limit, page) {
-        try {
-            return await productModel.paginate({ status: true }, { limit: limit, page: page, lean: true });
-        } catch (error) {
-            throw new Error(`⛔ Error al obtener datos de la BD: ${error.message}`);
-        }
-    }
-
     // En caso de encontrarlo, devuelve un objeto 'Producto' de acuerdo a id proporcionado por argumento.
     static async getProductById(id) {
         try {
@@ -165,7 +139,7 @@ class ProductManager {
     static async productCodeExists(productCode) {
         try {
             let productCodeFound = false;
-            const productFound = productModel.findOne({ code: productCode });
+            const productFound = productModel.findOne({ code: { '$regex': productCode, $options: 'i' } });
             if (productFound.code) productCodeFound = true;
             return productCodeFound;
         } catch {

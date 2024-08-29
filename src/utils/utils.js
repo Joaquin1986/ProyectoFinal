@@ -49,25 +49,46 @@ const preBuildResponse = (data) => {
     return response;
 }
 
-const buildResponseForApi = (data) => {
+const buildResponse = (data, type, sort, query) => {
     const preData = preBuildResponse(data);
-    const response = {
-        ...preData,
-        "prevLink": `${baseURL}api/products?limit=${data.limit}&page=${data.prevPage}`,
-        "nextLink": `${baseURL}api/products?limit=${data.limit}&page=${data.nextPage}`
+    let prevLink, nextLink;
+    if (data.hasPrevPage) {
+        prevLink = `${baseURL}${type}/products?limit=${data.limit}&page=${data.prevPage}`;
+        if (sort) prevLink += '&sort=' + sort;
+        if (query) prevLink += '&query=' + query;
+    } else {
+        prevLink = null;
     }
-    return response;
-}
-
-const buildResponseForView = (data) => {
-    const preData = preBuildResponse(data);
-    const response = {
+    if (data.hasNextPage) {
+        nextLink = `${baseURL}${type}/products?limit=${data.limit}&page=${data.nextPage}`;
+        if (sort) nextLink += '&sort=' + sort;
+        if (query) nextLink += '&query=' + query;
+    } else {
+        nextLink = null;
+    }
+    let response = {
         ...preData,
-        "prevLink": `${baseURL}views/products?limit=${data.limit}&page=${data.prevPage}`,
-        "nextLink": `${baseURL}views/products?limit=${data.limit}&page=${data.nextPage}`,
-        "firstLink": `${baseURL}views/products?limit=${data.limit}&page=1`,
-        "lastLink": `${baseURL}views/products?limit=${data.limit}&page=${data.totalPages}`,
-        "totalDocs": data.totalDocs
+        "prevLink": prevLink,
+        "nextLink": nextLink
+    }
+    if (type === 'views') {
+        let firstLink, lastLink;
+        firstLink = `${baseURL}views/products?limit=${data.limit}&page=1`;
+        lastLink = `${baseURL}views/products?limit=${data.limit}&page=${data.totalPages}`
+        if (sort) {
+            firstLink = firstLink + '&sort=' + sort;
+            lastLink = lastLink + '&sort=' + sort;
+        }
+        if (query) {
+            firstLink = firstLink + '&query=' + query;
+            lastLink = lastLink + '&query=' + query;
+        }
+        response = {
+            ...response,
+            "firstLink": firstLink,
+            "lastLink": lastLink,
+            "totalDocs": data.totalDocs
+        }
     }
     return response;
 }
@@ -78,6 +99,5 @@ module.exports = {
     viewsPath,
     thumbnailsPath,
     readJsonDataFromFile,
-    buildResponseForApi,
-    buildResponseForView
+    buildResponse
 };

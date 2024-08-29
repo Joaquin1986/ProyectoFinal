@@ -1,31 +1,32 @@
 const { Router } = require('express');
 const { Product, ProductManager } = require('../../controllers/ProductManager');
-const { uploadMulter, buildResponseForApi } = require('../../utils/utils');
+const { uploadMulter, buildResponse } = require('../../utils/utils');
 
 const productsApiRouter = Router();
 const maxFilesAllowed = 5;
 
+
+// Este Endpoint acepta por query param 'sort','limit' y 'query'. Para este ultimo caso, si se especifica
+// "available", devuelve todos los productos disponibles. En otro caso, toma el string recibido
+// como el nombre de la categoría a filtrar y busca los productos pertenecientes a la misma
 productsApiRouter.get("/products", async (req, res) => {
     let { limit, page, sort, query } = req.query;
-    if (sort && (sort.toLocaleLowerCase() !== 'asc' && sort.toLocaleLowerCase() !== 'desc')) sort = false;
     limit = parseInt(limit);
     page = parseInt(page);
     let criteria = {};
     let options = {};
     if (!limit || limit < 1) limit = 10;
     if (!page || page < 1) page = 1;
-    console.log(limit, page)
-    if (query) {
-        query = query.toLocaleLowerCase();
-        if (query === 'available') criteria = { "status": true };
-        else criteria = { "category": query };
-    }
-    sort ? options = { "limit": limit, "page": page, "sort": sort }
+    if (query && query.toLowerCase() === 'available')
+        criteria = { "status": true };
+    else if (query && query.toLowerCase() !== 'available')
+        criteria = { "category": { '$regex': query, $options: 'i' } };
+    if (sort && (sort.toLowerCase() !== 'asc' && sort.toLowerCase() !== 'desc')) sort = false;
+    sort ? options = { "limit": limit, "page": page, sort: { "price": sort } }
         : options = { "limit": limit, "page": page };
     let response;
     try {
-        console.log(criteria, options);
-        response = buildResponseForApi(await ProductManager.getPaginatedProducts(criteria, options));
+        response = buildResponse(await ProductManager.getPaginatedProducts(criteria, options), 'api', sort, query);
         return res.status(200).json(response);
     } catch {
         response = {
@@ -68,10 +69,10 @@ productsApiRouter.post("/products", uploadMulter.array('thumbnails'), async (req
         });
     } else {
         try {
-            if (status && status.toLowerCase() === 'false') {
+            if (status && typeof status !== 'boolean' && status.toLowerCase() === 'false')
                 newStatus = false;
-            }
-            const prod1 = new Product(title, description, parseInt(price), code, newStatus, parseInt(stock), category);
+            const prod1 = new Product(title, description, parseInt(price), code, newStatus,
+                parseInt(stock), category);
             // Si hay thumbnails subidas por Multer, se agregan al producto
             if (req.files && req.files.length > 0) {
                 req.files.forEach((file) => {
@@ -90,6 +91,7 @@ productsApiRouter.post("/products", uploadMulter.array('thumbnails'), async (req
                     `Producto ya existente: ${prodFound.title} (codigo: ${prodFound.code})`
             });
         } catch (error) {
+            console.log(error)
             return res.status(500).json({ "⛔Error interno:": error.message });
         }
     }

@@ -1,16 +1,26 @@
 const { Router } = require('express');
 const { ProductManager } = require('../../controllers/ProductManager');
-const { buildResponseForView } = require('../../utils/utils');
+const { buildResponse } = require('../../utils/utils');
 
 const productsViewsRouter = Router();
 const splideCss = 'https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css';
 
+// Por defecto, siempre se muestran productos que estén activados (status=true)
 productsViewsRouter.get('/products', async (req, res) => {
-  let { limit, page } = req.query;
-  if (!limit || parseInt(limit) < 1) limit = 10;
-  if (!page || parseInt(page) < 1) page = 1;
-  const enabledProducts = await ProductManager.getEnabledProducts(parseInt(limit), parseInt(page));
-  const builtResponse = buildResponseForView(enabledProducts);
+  let { limit, page, sort, query } = req.query;
+  let criteria = { "status": true };
+  let options = {};
+  limit = parseInt(limit);
+  page = parseInt(page);
+  if (query && query.toLowerCase() !== 'available')
+    criteria = { "category": { '$regex': query.toLowerCase(), $options: 'i' } };
+  if (sort && (sort.toLowerCase() !== 'asc' && sort.toLowerCase() !== 'desc')) sort = false;
+  sort ? options = { "limit": limit, "page": page, lean: true, sort: { "price": sort } }
+    : options = { "limit": limit, "page": page, lean: true };
+  if (!limit || limit < 1) limit = 10;
+  if (!page || page < 1) page = 1;
+  const productsToDisplay = await ProductManager.getPaginatedProducts(criteria, options);
+  const builtResponse = buildResponse(productsToDisplay, 'views', sort, query);
   const { payload, ...details } = builtResponse;
   const title = "APP -> Listado de Productos 📦";
   res.render('index', { products: payload, title: title, details: details });

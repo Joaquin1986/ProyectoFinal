@@ -110,3 +110,38 @@ function buyProductButton(event) {
   }
   window.location.href = '/views/products/' + event.target.id;
 }
+
+function filteredSortedSearch() {
+  const sortOption = document.getElementById('sortOption').selectedOptions[0].value;
+  const limitOption = parseInt(document.getElementById('limitOption').selectedOptions[0].value);
+  const categoryText = document.getElementById('filterText').value;
+  let url = '/views/products';
+  optionSelected = false;
+  if (sortOption !== '' && sortOption !== 'unselected') {
+    url += '?sort=' + sortOption;
+    optionSelected = true;
+  } else if (sortOption === '') optionSelected = true;
+  if (optionSelected && (!isNaN(limitOption) && limitOption !== 10 && limitOption !== 'unselected'))
+    url += '&limit=' + limitOption
+  else if (!optionSelected && (!isNaN(limitOption) && limitOption !== 10 && limitOption !== 'unselected')) {
+    url += '?limit=' + limitOption;
+    optionSelected = true;
+  } else if (!optionSelected && limitOption === 10) optionSelected = true;
+  if (optionSelected && (sortOption !== '' && sortOption !== 'unselected') && categoryText !== '')
+    url += '&query=' + categoryText;
+  else if (!optionSelected && (sortOption === '' || sortOption !== 'unselected') && categoryText !== '') {
+    url += '?query=' + categoryText;
+    optionSelected = true;
+  }
+  !optionSelected ? 
+    errorToast.fire({
+      icon: "error",
+      text: "Opciones de Búsqueda sin parámetros"
+    })
+    :
+    successToast.fire({
+      icon: "success",
+      text: "Aplicando los parámetros establecidos..."
+    }).then(() => window.location.href = url);
+
+}

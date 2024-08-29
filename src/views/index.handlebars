@@ -11,6 +11,29 @@
     </nav>
     <hr />
     <h1 class="hProd">Home de Productos 🏡</h1>
+    <div id="filterSortDiv">
+        <hr />
+        <details>
+            <summary>Opciones de búsqueda ⚙🔎</summary>
+            <fieldset role="group">
+                <select name="sort" aria-label="sort" id="sortOption">
+                    <option selected disabled value="unselected">Orden por Precio</option>
+                    <option value="">Sin orden</option>
+                    <option value="asc">Menor a mayor (asc)</option>
+                    <option value="desc">Mayor a menor (desc)</option>
+                </select>
+                  <select name="limit" aria-label="limit" id="limitOption">
+                    <option selected disabled value="unselected">Límite por Página</option>
+                    <option value="6">6 Productos</option>
+                    <option value="10">10 Productos</option>
+                    <option value="20">20 Productos</option>
+                </select>
+                <input name="query" type="text" id="filterText" placeholder="<Ingrese categoría a buscar>" value="" />
+                <input type="submit" value="Buscar" onclick="filteredSortedSearch()" />
+            </fieldset>
+        </details>
+        <hr />
+    </div>
     {{#if products}}
     <div id="productsGrid">
         {{#each products}}

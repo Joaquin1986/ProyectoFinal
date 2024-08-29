@@ -72,8 +72,8 @@ cartsApiRouter.post("/carts/:cid/order", async (req, res) => {
             } else {
                 res.status(400).json({
                     "error":
-                        "Request no válido"
-                })
+                        "Carrito no válido"
+                });
             }
         } catch (error) {
             res.status(500).json({ "internalError": error.message });
@@ -82,7 +82,7 @@ cartsApiRouter.post("/carts/:cid/order", async (req, res) => {
         res.status(400).json({
             "error":
                 "Request no válido, revisar valores enviados"
-        })
+        });
     }
 });
 
