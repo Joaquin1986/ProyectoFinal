@@ -47,9 +47,9 @@ initServer(app).then(() => {
     }));
 
     app.use((error, req, res, next) => {
-        const message = `⛔ Error desconocido: ${error.message}`;
+        const message = `⛔ Petición incorrecta: ${error.message}`;
         console.error(message);
-        res.status(500).json({ message });
+        res.status(400).json({ message });
     });
 
 });

@@ -188,7 +188,7 @@ async function addToCart(event) {
   const backToProductsButton = document.getElementById('backToProductsButton');
   const removeProductDetailDisplay = document.getElementById('removeProductDetailDisplay');
   const addProductDetailDisplay = document.getElementById('addProductDetailDisplay');
-  const url = '/api/carts/' + currentCartId + '/product/' + productId;
+  const url = '/api/carts/' + currentCartId + '/products/' + productId;
   const result = await addProductToCart(url, itemCount.innerText);
   const productsCount = document.getElementById('navCartButton');
   const lastCount = parseInt(productsCount.innerText.split('🛒')[1]);

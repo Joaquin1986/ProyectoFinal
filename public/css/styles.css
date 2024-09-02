@@ -156,7 +156,8 @@ input {
     border-color: #5c1313;
 }
 
-#cartDeleteButton:hover {
+#cartDeleteButton:hover,
+#filterSortDiv:hover {
     filter: brightness(105%);
 }
 

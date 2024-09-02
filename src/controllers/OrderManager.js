@@ -33,7 +33,7 @@ class OrderManager {
             if (mongoose.isValidObjectId(cid)) {
                 return await orderModel.findOne({ cart: cid }).lean();
             }
-            return undefined;
+            return false;
         } catch (error) {
             throw new Error(`⛔ Error: No se pudo verificar si existe la orden id#${id} => error: ${error.message}`)
         }

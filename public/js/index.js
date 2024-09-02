@@ -126,14 +126,16 @@ function filteredSortedSearch() {
   else if (!optionSelected && (!isNaN(limitOption) && limitOption !== 10 && limitOption !== 'unselected')) {
     url += '?limit=' + limitOption;
     optionSelected = true;
-  } else if (!optionSelected && limitOption === 10) optionSelected = true;
-  if (optionSelected && (sortOption !== '' && sortOption !== 'unselected') && categoryText !== '')
-    url += '&query=' + categoryText;
-  else if (!optionSelected && (sortOption === '' || sortOption !== 'unselected') && categoryText !== '') {
-    url += '?query=' + categoryText;
+  }
+  else if (!optionSelected && limitOption === 10) optionSelected = true;
+  if (optionSelected && (sortOption !== '' && sortOption !== 'unselected') && categoryText !== '') {
+    url += '&category=' + categoryText;
+  }
+  else if (!optionSelected && (sortOption === '' || sortOption === 'unselected') && categoryText !== '') {
+    url += '?category=' + categoryText;
     optionSelected = true;
   }
-  !optionSelected ? 
+  !optionSelected ?
     errorToast.fire({
       icon: "error",
       text: "Opciones de Búsqueda sin parámetros"

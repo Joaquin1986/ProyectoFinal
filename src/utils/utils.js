@@ -49,20 +49,20 @@ const preBuildResponse = (data) => {
     return response;
 }
 
-const buildResponse = (data, type, sort, query) => {
+const buildResponse = (data, type, sort, category) => {
     const preData = preBuildResponse(data);
     let prevLink, nextLink;
     if (data.hasPrevPage) {
         prevLink = `${baseURL}${type}/products?limit=${data.limit}&page=${data.prevPage}`;
         if (sort) prevLink += '&sort=' + sort;
-        if (query) prevLink += '&query=' + query;
+        if (category) prevLink += '&category=' + category;
     } else {
         prevLink = null;
     }
     if (data.hasNextPage) {
         nextLink = `${baseURL}${type}/products?limit=${data.limit}&page=${data.nextPage}`;
         if (sort) nextLink += '&sort=' + sort;
-        if (query) nextLink += '&query=' + query;
+        if (category) nextLink += '&category=' + category;
     } else {
         nextLink = null;
     }
@@ -79,9 +79,9 @@ const buildResponse = (data, type, sort, query) => {
             firstLink = firstLink + '&sort=' + sort;
             lastLink = lastLink + '&sort=' + sort;
         }
-        if (query) {
-            firstLink = firstLink + '&query=' + query;
-            lastLink = lastLink + '&query=' + query;
+        if (category) {
+            firstLink = firstLink + '&category=' + category;
+            lastLink = lastLink + '&category=' + category;
         }
         response = {
             ...response,
@@ -97,7 +97,6 @@ module.exports = {
     uploadMulter,
     publicPath,
     viewsPath,
-    thumbnailsPath,
     readJsonDataFromFile,
     buildResponse
 };

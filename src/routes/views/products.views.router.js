@@ -7,20 +7,22 @@ const splideCss = 'https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/
 
 // Por defecto, siempre se muestran productos que estén activados (status=true)
 productsViewsRouter.get('/products', async (req, res) => {
-  let { limit, page, sort, query } = req.query;
+  let { limit, page, sort, category } = req.query;
   let criteria = { "status": true };
   let options = {};
   limit = parseInt(limit);
   page = parseInt(page);
-  if (query && query.toLowerCase() !== 'available')
-    criteria = { "category": { '$regex': query.toLowerCase(), $options: 'i' } };
+  if (category)
+    criteria = { "category": { '$regex': category, $options: 'i' }, "deleted": false, "status": true };
+  else
+    criteria = { "deleted": false, "status": true };
   if (sort && (sort.toLowerCase() !== 'asc' && sort.toLowerCase() !== 'desc')) sort = false;
   sort ? options = { "limit": limit, "page": page, lean: true, sort: { "price": sort } }
     : options = { "limit": limit, "page": page, lean: true };
   if (!limit || limit < 1) limit = 10;
   if (!page || page < 1) page = 1;
   const productsToDisplay = await ProductManager.getPaginatedProducts(criteria, options);
-  const builtResponse = buildResponse(productsToDisplay, 'views', sort, query);
+  const builtResponse = buildResponse(productsToDisplay, 'views', sort, category);
   const { payload, ...details } = builtResponse;
   const title = "APP -> Listado de Productos 📦";
   res.render('index', { products: payload, title: title, details: details });

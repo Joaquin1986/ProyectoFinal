@@ -28,7 +28,6 @@ async function deleteCart(url) {
                 text: "Carrito borrado exitosamente",
                 icon: "success"
             }).then(() => {
-                localStorage.removeItem('currentCartId');
                 window.location.href = '/views/products';
             });
         } else {
@@ -56,7 +55,7 @@ async function removeProductFromCart(event) {
         removeButtons[i].innerText = ''
     }
     try {
-        const response = await fetch(`/api/carts/${cartId}/product/${productId}`, {
+        const response = await fetch(`/api/carts/${cartId}/products/${productId}`, {
             method: 'DELETE',
             headers: {
                 "Accept": "*/*"

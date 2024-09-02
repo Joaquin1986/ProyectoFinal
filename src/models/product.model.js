@@ -34,7 +34,11 @@ const productSchema = new Schema({
         type: String,
         required: [true, "la categoría es obligatoria"],
         index: true
-    }
+    },
+    deleted: {
+        type: Boolean,
+        default: false
+    },
 }, { timestamps: true });
 
 productSchema.plugin(mongoosePaginate);

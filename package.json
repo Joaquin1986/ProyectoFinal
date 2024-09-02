@@ -1,7 +1,7 @@
 {
   "name": "almacen-productos",
-  "version": "2.0.0",
-  "description": "",
+  "version": "3.0.0",
+  "description": "proyecto final de backend I (Comision 70095)",
   "main": "src/app.js",
   "scripts": {
     "start": "node .",

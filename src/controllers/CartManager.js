@@ -75,7 +75,7 @@ class CartManager {
                     console.log(`✅ +${quantity} de producto #${productId} agregado al carrito #${cartId}`);
                     return true;
                 }
-                console.error('⛔ Error: producto o carrito no existente')
+                console.error('⛔ Error: producto o carrito inexistente')
                 return false;
             }
             console.error('⛔ Error: se recibieron argumentos no válidos');
@@ -84,7 +84,7 @@ class CartManager {
             throw new Error(`⛔ Error: No se pudo guardar el cambio en la BD => error: ${error.message}`);
         }
     }
-
+    
     // Si un producto existe en un carrito determinado, devuelve 'true'. Caso contrario, devuelve 'false'
     static async isProductInCart(cid, pid) {
         try {
@@ -102,19 +102,21 @@ class CartManager {
                     }
                 }
             }
+            if (!productFoundInCart)
+                console.error(`⛔ Error: no se encontró el producto #${pid} en el carrito #${cid}`);
             return productFoundInCart;
         } catch (error) {
             throw new Error(`⛔ Error: No se pudo verificar la existencia del producto #${pid} en el carrito #${cid} => error: ${error.message}`)
         }
     }
 
-    // En caso de encontrarlo, borra el carrito indicado. Si el carrito no existe, devuelve 'false'
+    // En caso de encontrarlo, elimina todos los productos del carrito indicado. Si el carrito no existe, devuelve 'false'
     static async deleteCart(id) {
         try {
             if (mongoose.isValidObjectId(id)) {
                 const cart = this.getCartById(id);
                 if (cart) {
-                    return await cartModel.deleteOne({ _id: id });
+                    return await cartModel.updateOne({ _id: id }, { $set: { products: [] } });
                 }
             }
             return false;
