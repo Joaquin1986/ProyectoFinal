@@ -35,7 +35,7 @@ class OrderManager {
             }
             return false;
         } catch (error) {
-            throw new Error(`⛔ Error: No se pudo verificar si existe la orden id#${id} => error: ${error.message}`)
+            throw new Error(`⛔ Error: No se pudo verificar si existe orden asociada al carrito #${cid} => error: ${error.message}`)
         }
     }
 
