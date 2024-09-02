@@ -173,7 +173,7 @@ cartsApiRouter.delete("/carts/:cid/products/:pid", async (req, res) => {
             return res.status(400).json({ 'error': `Carrito #${cid} inexistente` });
         const cartAlreadyOrdered = await OrderManager.isCartAldreadyOrdered(cid);
         if (cartAlreadyOrdered)
-            return res.status(400).json({ 'error': `Orden ${cid} ya finalizada` });
+            return res.status(400).json({ 'error': `Orden ya finalizada` });
         const isProductInCart = await CartManager.isProductInCart(cid, pid);
         if (isProductInCart) {
             const result = await CartManager.deleteProductFromCart(cid, pid);
